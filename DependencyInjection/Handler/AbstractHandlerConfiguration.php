@@ -5,7 +5,7 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection\Handler;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Tests\Fixtures\Builder\VariableNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 abstract class AbstractHandlerConfiguration
 {
