@@ -37,7 +37,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('monolog');
         $rootNode = $treeBuilder->getRootNode();
 
-        $handlers = $rootNode
+        $handlersNode = $rootNode
             ->fixXmlConfig('channel')
             ->fixXmlConfig('handler')
             ->children()
@@ -48,8 +48,45 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('handlers');
 
+        $handlersNode
+            ->canBeUnset()
+            ->useAttributeAsKey('name')
+            ->validate()
+                ->ifTrue(function ($v) { return isset($v['debug']); })
+                ->thenInvalid('The "debug" name cannot be used as it is reserved for the handler of the profiler')
+            ->end()
+            ->example([
+                'syslog' => [
+                    'type' => 'stream',
+                    'path' => '/var/log/symfony.log',
+                    'level' => 'ERROR',
+                    'bubble' => 'false',
+                    'formatter' => 'my_formatter',
+                ],
+                'main' => [
+                    'type' => 'fingers_crossed',
+                    'action_level' => 'WARNING',
+                    'buffer_size' => 30,
+                    'handler' => 'custom',
+                ],
+                'custom' => [
+                    'type' => 'service',
+                    'id' => 'my_handler',
+                ],
+            ]);
+
+        $handlerNode = $handlersNode
+            ->prototype('array')
+                ->fixXmlConfig('member')
+                ->fixXmlConfig('excluded_404')
+                ->fixXmlConfig('excluded_http_code')
+                ->fixXmlConfig('tag')
+                ->fixXmlConfig('accepted_level')
+                ->fixXmlConfig('header')
+                ->canBeUnset();
+
         foreach (HandlerType::cases() as $type) {
-            $this->addHandlerConfigurationByType($type, $handlers);
+            $this->addHandlerConfigurationByType($type, $handlerNode);
         }
 
         return $treeBuilder;
@@ -58,7 +95,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Add a handler configuration from a handler type.
      */
-    public function addHandlerConfigurationByType(HandlerType $type, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): static
+    public function addHandlerConfigurationByType(HandlerType $type, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlersNode): static
     {
         $class = $type->getHandlerConfigurationClass();
 
@@ -70,14 +107,13 @@ class Configuration implements ConfigurationInterface
             throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
         }
 
-        $configuration = new $class($node);
+        $configuration = new $class();
 
         if (!$configuration instanceof AbstractHandlerConfiguration) {
             throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, \get_debug_type($configuration)));
         }
 
-        $configuration->addLegacyOptions();
-        $configuration->addOptions();
+        $configuration($handlersNode);
 
         return $this;
     }

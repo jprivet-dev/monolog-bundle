@@ -5,49 +5,14 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection\Handler;
 use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
 {
-    public function addLegacyOptions(): void
+    public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $this->handlersNode
-            ->canBeUnset()
-            ->useAttributeAsKey('name')
-            ->validate()
-                ->ifTrue(function ($v) { return isset($v['debug']); })
-                ->thenInvalid('The "debug" name cannot be used as it is reserved for the handler of the profiler')
-            ->end()
-            ->example([
-                'syslog' => [
-                    'type' => 'stream',
-                    'path' => '/var/log/symfony.log',
-                    'level' => 'ERROR',
-                    'bubble' => 'false',
-                    'formatter' => 'my_formatter',
-                ],
-                'main' => [
-                    'type' => 'fingers_crossed',
-                    'action_level' => 'WARNING',
-                    'buffer_size' => 30,
-                    'handler' => 'custom',
-                ],
-                'custom' => [
-                    'type' => 'service',
-                    'id' => 'my_handler',
-                ],
-            ]);
-
-        $handlerNode = $this->handlersNode
-            ->prototype('array')
-                ->fixXmlConfig('member')
-                ->fixXmlConfig('excluded_404')
-                ->fixXmlConfig('excluded_http_code')
-                ->fixXmlConfig('tag')
-                ->fixXmlConfig('accepted_level')
-                ->fixXmlConfig('header')
-                ->canBeUnset();
-
         $handlerNode
             ->children()
                 ->scalarNode('type')
@@ -750,11 +715,6 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
                 ->end()
             ->end()
         ;
-    }
-
-    public function addOptions(): void
-    {
-        // TODO: Implement addOptions() method.
     }
 
     public function getType(): HandlerType

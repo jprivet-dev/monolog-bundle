@@ -6,16 +6,23 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
+use Symfony\Component\Scheduler\Tests\Handler;
 
 abstract class AbstractHandlerConfiguration
 {
-    public function __construct(protected NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlersNode)
+    protected function typeNode(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): ArrayNodeDefinition
     {
+        $typeName = $this->getType()->value;
+
+        return $handlerNode
+            ->children()
+                ->arrayNode('type_'.$typeName)
+                    ->canBeUnset()
+                    ->info(sprintf('"%s" type handler (one type of handler per name and per environment).', $typeName))
+        ;
     }
 
-    abstract public function addLegacyOptions(): void;
-
-    abstract public function addOptions(): void;
+    abstract public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void;
 
     abstract public function getType(): HandlerType;
 }

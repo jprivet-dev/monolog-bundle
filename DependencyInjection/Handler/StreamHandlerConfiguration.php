@@ -5,16 +5,42 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection\Handler;
 use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class StreamHandlerConfiguration extends AbstractHandlerConfiguration
 {
-    public function addLegacyOptions(): void
+    public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-    }
+        $this->typeNode($handlerNode)
+            ->children()
+                ->scalarNode('level')
+                    ->defaultValue('DEBUG')
+                    ->info('Level name or int value, defaults to DEBUG.')
+                ->end()
+                ->booleanNode('bubble')->defaultTrue()->end()
+                ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // stream and rotating
+                ->scalarNode('file_permission')  // stream and rotating
+                    ->defaultNull()
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function ($v) {
+                            if ('0' === substr($v, 0, 1)) {
+                                return octdec($v);
+                            }
 
-    public function addOptions(): void
-    {
+                            return (int) $v;
+                        })
+                    ->end()
+                ->end()
+                ->booleanNode('use_locking')->defaultFalse()->end() // stream and rotating
+                ->booleanNode('nested')
+                    ->defaultFalse()
+                    ->info('All handlers can also be marked with `nested: true` to make sure they are never added explicitly to the stack.')
+                ->end()
+            ->end()
+        ;
     }
 
     public function getType(): HandlerType
