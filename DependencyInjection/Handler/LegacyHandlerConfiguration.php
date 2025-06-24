@@ -11,7 +11,36 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function addLegacyOptions(): void
     {
-        $handlerNode = $this->node
+        $handlers = $this->node;
+
+        $handlers
+            ->canBeUnset()
+            ->useAttributeAsKey('name')
+            ->validate()
+                ->ifTrue(function ($v) { return isset($v['debug']); })
+                ->thenInvalid('The "debug" name cannot be used as it is reserved for the handler of the profiler')
+            ->end()
+            ->example([
+                'syslog' => [
+                    'type' => 'stream',
+                    'path' => '/var/log/symfony.log',
+                    'level' => 'ERROR',
+                    'bubble' => 'false',
+                    'formatter' => 'my_formatter',
+                ],
+                'main' => [
+                    'type' => 'fingers_crossed',
+                    'action_level' => 'WARNING',
+                    'buffer_size' => 30,
+                    'handler' => 'custom',
+                ],
+                'custom' => [
+                    'type' => 'service',
+                    'id' => 'my_handler',
+                ],
+            ]);
+
+        $handlerNode = $handlers
             ->prototype('array')
                 ->fixXmlConfig('member')
                 ->fixXmlConfig('excluded_404')
