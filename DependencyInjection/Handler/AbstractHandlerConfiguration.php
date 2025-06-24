@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 abstract class AbstractHandlerConfiguration
 {
-    public function __construct(protected NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node)
+    public function __construct(protected NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlersNode)
     {
     }
 

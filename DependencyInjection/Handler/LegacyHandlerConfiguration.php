@@ -11,9 +11,7 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function addLegacyOptions(): void
     {
-        $handlers = $this->node;
-
-        $handlers
+        $this->handlersNode
             ->canBeUnset()
             ->useAttributeAsKey('name')
             ->validate()
@@ -40,7 +38,7 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
                 ],
             ]);
 
-        $handlerNode = $handlers
+        $handlerNode = $this->handlersNode
             ->prototype('array')
                 ->fixXmlConfig('member')
                 ->fixXmlConfig('excluded_404')
