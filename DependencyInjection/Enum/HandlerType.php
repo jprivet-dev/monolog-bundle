@@ -3,11 +3,12 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection\Enum;
 
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LegacyHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\StreamHandlerConfiguration;
 
 enum HandlerType: string
 {
     case LEGACY = 'legacy';
-//    case STREAM = 'stream';
+    case STREAM = 'stream';
 //    case CONSOLE = 'console';
 //    case FIREPHP = 'firephp';
 //    case BROWSER_CONSOLE = 'browser_console';
@@ -60,7 +61,7 @@ enum HandlerType: string
     {
         return match ($this) {
             self::LEGACY => LegacyHandlerConfiguration::class,
-//            self::STREAM => StreamHandlerConfiguration::class,
+            self::STREAM => StreamHandlerConfiguration::class,
 //            self::CONSOLE => ConsoleHandlerConfiguration::class,
 //            self::FIREPHP => FirePhpHandlerConfiguration::class,
 //            self::BROWSER_CONSOLE => BrowserConsoleHandlerConfiguration::class,
