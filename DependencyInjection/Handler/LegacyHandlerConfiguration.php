@@ -11,7 +11,7 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function addLegacyOptions(): void
     {
-        $this->node
+        $handlerNode = $this->node
             ->prototype('array')
                 ->fixXmlConfig('member')
                 ->fixXmlConfig('excluded_404')
@@ -21,7 +21,7 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
                 ->fixXmlConfig('header')
                 ->canBeUnset();
 
-        $this->node
+        $handlerNode
             ->children()
                 ->scalarNode('type')
                     ->isRequired()
@@ -214,16 +214,16 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
                 ->booleanNode('nested')->defaultFalse()->end()
             ->end();
 
-        $this->addGelfSection($this->node);
-        $this->addMongoSection($this->node);
-        $this->addElasticsearchSection($this->node);
-        $this->addRedisSection($this->node);
-        $this->addPredisSection($this->node);
-        $this->addMailerSection($this->node);
-        $this->addVerbosityLevelSection($this->node);
-        $this->addChannelsSection($this->node);
+        $this->addGelfSection($handlerNode);
+        $this->addMongoSection($handlerNode);
+        $this->addElasticsearchSection($handlerNode);
+        $this->addRedisSection($handlerNode);
+        $this->addPredisSection($handlerNode);
+        $this->addMailerSection($handlerNode);
+        $this->addVerbosityLevelSection($handlerNode);
+        $this->addChannelsSection($handlerNode);
 
-        $this->node
+        $handlerNode
             ->beforeNormalization()
                 ->always(static function ($v) {
                     if (empty($v['console_formatter_options']) && !empty($v['console_formater_options'])) {
@@ -386,9 +386,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addGelfSection(ArrayNodeDefinition $node): void
+    private function addGelfSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->arrayNode('publisher')
                     ->canBeUnset()
@@ -417,9 +417,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addMongoSection(ArrayNodeDefinition $node): void
+    private function addMongoSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->arrayNode('mongo')
                     ->canBeUnset()
@@ -457,9 +457,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addElasticsearchSection(ArrayNodeDefinition $node)
+    private function addElasticsearchSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->arrayNode('elasticsearch')
                     ->canBeUnset()
@@ -489,9 +489,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addRedisSection(ArrayNodeDefinition $node): void
+    private function addRedisSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->arrayNode('redis')
                     ->canBeUnset()
@@ -522,9 +522,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addPredisSection(ArrayNodeDefinition $node): void
+    private function addPredisSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->arrayNode('predis')
                     ->canBeUnset()
@@ -551,9 +551,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addMailerSection(ArrayNodeDefinition $node): void
+    private function addMailerSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->scalarNode('from_email')->end() // swift_mailer, native_mailer, symfony_mailer and flowdock
                 ->arrayNode('to_email') // swift_mailer, native_mailer and symfony_mailer
@@ -598,9 +598,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addVerbosityLevelSection(ArrayNodeDefinition $node): void
+    private function addVerbosityLevelSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->arrayNode('verbosity_levels') // console
                     ->beforeNormalization()
@@ -658,9 +658,9 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
         ;
     }
 
-    private function addChannelsSection(ArrayNodeDefinition $node)
+    private function addChannelsSection(ArrayNodeDefinition $handerNode)
     {
-        $node
+        $handerNode
             ->children()
                 ->arrayNode('channels')
                     ->fixXmlConfig('channel', 'elements')
