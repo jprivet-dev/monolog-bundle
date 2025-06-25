@@ -4,6 +4,7 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\AbstractHandlerConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
@@ -199,9 +200,9 @@ class LegacyConfiguration implements AppendConfigurationInterface
             throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
         }
 
-//        if (!$class instanceof AbstractHandlerConfiguration) {
-//            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, \get_debug_type($class)));
-//        }
+        if (!is_subclass_of($class, AbstractHandlerConfiguration::class)) {
+            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, $class));
+        }
 
         $class::addOptions($handlerNode, $legacy);
     }
