@@ -3,7 +3,6 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Monolog\Logger;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChannelsHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ElasticsearchHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GelfHandlerConfiguration;
