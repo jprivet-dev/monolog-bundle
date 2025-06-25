@@ -26,7 +26,7 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\InsightopsHandlerCo
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogentriesHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogglyHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NativemailerHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NativeMailerHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NewrelicHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NullHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PredisHandlerConfiguration;
@@ -44,8 +44,8 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackHandlerConfigu
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackwebhookHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SocketHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\StreamHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SwiftmailerHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SymfonymailerHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SwiftMailerHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SymfonyMailerHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SyslogHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SyslogudpHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\TelegramHandlerConfiguration;
@@ -130,9 +130,9 @@ enum HandlerType: string
             self::SYSLOG => SyslogHandlerConfiguration::class,
             self::SYSLOGUDP => SyslogudpHandlerConfiguration::class,
             self::CHROMEPHP => ChromephpHandlerConfiguration::class,
-            self::SWIFT_MAILER => SwiftmailerHandlerConfiguration::class,
-            self::NATIVE_MAILER => NativemailerHandlerConfiguration::class,
-            self::SYMFONY_MAILER => SymfonymailerHandlerConfiguration::class,
+            self::SWIFT_MAILER => SwiftMailerHandlerConfiguration::class,
+            self::NATIVE_MAILER => NativeMailerHandlerConfiguration::class,
+            self::SYMFONY_MAILER => SymfonyMailerHandlerConfiguration::class,
             self::VERBOSITY_LEVELS => VerbosityLevelHandlerConfiguration::class,
             self::CHANNELS => ChannelsHandlerConfiguration::class,
             self::SOCKET => SocketHandlerConfiguration::class,

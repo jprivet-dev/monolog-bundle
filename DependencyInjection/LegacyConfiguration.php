@@ -3,35 +3,7 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Monolog\Logger;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChannelsHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\CubeHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ElasticsearchHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FilterHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FingerscrossedHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FlowdockHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GelfHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\HipchatHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\InsightopsHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogentriesHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogglyHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NativeMailerHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PredisHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PushoverHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RavenHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RedisHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RollbarHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ServerlogHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ServiceHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackbotHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackwebhookHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SocketHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SwiftMailerHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SymfonyMailerHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SyslogudpHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\TelegramHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\VerbosityLevelHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
@@ -212,76 +184,36 @@ class LegacyConfiguration implements AppendConfigurationInterface
                     ->end()
                     ->prototype('scalar')->end()
                 ->end()
-                 // console
-                ->variableNode('console_formater_options')
-                    ->setDeprecated('symfony/monolog-bundle', 3.7, '"%path%.%node%" is deprecated, use "%path%.console_formatter_options" instead.')
-                    ->validate()
-                        ->ifTrue(function ($v) {
-                            return !\is_array($v);
-                        })
-                        ->thenInvalid('The console_formater_options must be an array.')
-                    ->end()
-                ->end()
-                ->variableNode('console_formatter_options')
-                    ->defaultValue([])
-                    ->validate()
-                        ->ifTrue(static function ($v) { return !\is_array($v); })
-                        ->thenInvalid('The console_formatter_options must be an array.')
-                    ->end()
-                ->end()
                 ->scalarNode('formatter')->end()
                 ->booleanNode('nested')->defaultFalse()->end()
             ->end();
 
-        GelfHandlerConfiguration::addOptions($handlerNode, true);
-        MongoHandlerConfiguration::addOptions($handlerNode, true);
-        ElasticsearchHandlerConfiguration::addOptions($handlerNode, true);
-        RedisHandlerConfiguration::addOptions($handlerNode, true);
-        PredisHandlerConfiguration::addOptions($handlerNode, true);
-        SwiftMailerHandlerConfiguration::addOptions($handlerNode, true);
-        NativeMailerHandlerConfiguration::addOptions($handlerNode, true);
-        SymfonyMailerHandlerConfiguration::addOptions($handlerNode, true);
-        VerbosityLevelHandlerConfiguration::addOptions($handlerNode, true);
-        ChannelsHandlerConfiguration::addOptions($handlerNode, true);
+        foreach (HandlerType::cases() as $type) {
+            $this->addOptionsByClass($this->getHandlerConfigurationClassByType($type), $handlerNode, true);
+        }
+    }
 
-        $handlerNode
-            ->beforeNormalization()
-                ->always(static function ($v) {
-                    if (empty($v['console_formatter_options']) && !empty($v['console_formater_options'])) {
-                        $v['console_formatter_options'] = $v['console_formater_options'];
-                    }
+    private function addOptionsByClass(string $class, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode, bool $legacy = false): void
+    {
+        if (!class_exists($class)) {
+            throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
+        }
 
-                    return $v;
-                })
-            ->end()
-            ->validate()
-                ->always(static function ($v) {
-                    unset($v['console_formater_options']);
+//        if (!$class instanceof AbstractHandlerConfiguration) {
+//            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, \get_debug_type($class)));
+//        }
 
-                    return $v;
-                })
-            ->end()
-        ;
+        $class::addOptions($handlerNode, $legacy);
+    }
 
-        ServiceHandlerConfiguration::addOptions($handlerNode, true);
-        FingerscrossedHandlerConfiguration::addOptions($handlerNode, true);
-        FilterHandlerConfiguration::addOptions($handlerNode, true);
-        RollbarHandlerConfiguration::addOptions($handlerNode, true);
-        TelegramHandlerConfiguration::addOptions($handlerNode, true);
-        ServiceHandlerConfiguration::addOptions($handlerNode, true);
-        SyslogudpHandlerConfiguration::addOptions($handlerNode, true);
-        SocketHandlerConfiguration::addOptions($handlerNode, true);
-        PushoverHandlerConfiguration::addOptions($handlerNode, true);
-        RavenHandlerConfiguration::addOptions($handlerNode, true);
-        HipchatHandlerConfiguration::addOptions($handlerNode, true);
-        SlackHandlerConfiguration::addOptions($handlerNode, true);
-        SlackwebhookHandlerConfiguration::addOptions($handlerNode, true);
-        SlackbotHandlerConfiguration::addOptions($handlerNode, true);
-        CubeHandlerConfiguration::addOptions($handlerNode, true);
-        LogglyHandlerConfiguration::addOptions($handlerNode, true);
-        LogentriesHandlerConfiguration::addOptions($handlerNode, true);
-        InsightopsHandlerConfiguration::addOptions($handlerNode, true);
-        FlowdockHandlerConfiguration::addOptions($handlerNode, true);
-        ServerlogHandlerConfiguration::addOptions($handlerNode, true);
+    private function getHandlerConfigurationClassByType(HandlerType $type): string
+    {
+        $class = $type->getHandlerConfigurationClass();
+
+        if (!$class) {
+            throw new \RuntimeException(\sprintf('The handler configuration "%s" is not registered.', $type->value));
+        }
+
+        return $class;
     }
 }

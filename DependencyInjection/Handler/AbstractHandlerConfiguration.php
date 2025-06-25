@@ -20,5 +20,7 @@ abstract class AbstractHandlerConfiguration implements AppendConfigurationInterf
         ;
     }
 
+    abstract static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void;
+
     abstract public function getType(): HandlerType;
 }
