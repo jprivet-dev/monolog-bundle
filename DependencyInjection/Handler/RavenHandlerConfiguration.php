@@ -11,11 +11,23 @@ class RavenHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $this->typeNode($handlerNode)
-            ->children()
-                // TODO: Nodes...
-            ->end()
-        ;
+        static::addOptions($this->typeNode($handlerNode));
+    }
+
+    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    {
+        if($legacy) {
+            $node
+                ->validate()
+                    ->ifTrue(function ($v) { return 'sentry' === $v['type'] && !\array_key_exists('dsn', $v) && null === $v['hub_id'] && null === $v['client_id']; })
+                    ->thenInvalid('The DSN has to be specified to use Sentry\'s handler')
+                ->end()
+                ->validate()
+                    ->ifTrue(function ($v) { return 'sentry' === $v['type'] && null !== $v['hub_id'] && null !== $v['client_id']; })
+                    ->thenInvalid('You can not use both a hub_id and a client_id in a Sentry handler')
+                ->end()
+            ;
+        }
     }
 
     public function getType(): HandlerType

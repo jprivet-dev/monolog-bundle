@@ -11,11 +11,19 @@ class CubeHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $this->typeNode($handlerNode)
-            ->children()
-                // TODO: Nodes...
-            ->end()
-        ;
+        static::addOptions($this->typeNode($handlerNode));
+    }
+
+    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    {
+        if($legacy) {
+            $node
+                ->validate()
+                    ->ifTrue(function ($v) { return 'cube' === $v['type'] && empty($v['url']); })
+                    ->thenInvalid('The url has to be specified to use a CubeHandler')
+                ->end()
+            ;
+        }
     }
 
     public function getType(): HandlerType

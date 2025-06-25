@@ -11,11 +11,23 @@ class FilterHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $this->typeNode($handlerNode)
-            ->children()
-                // TODO: Nodes...
-            ->end()
-        ;
+        static::addOptions($this->typeNode($handlerNode));
+    }
+
+    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    {
+        if($legacy) {
+            $node
+                ->validate()
+                    ->ifTrue(function ($v) { return 'filter' === $v['type'] && 'DEBUG' !== $v['min_level'] && !empty($v['accepted_levels']); })
+                    ->thenInvalid('You can not use min_level together with accepted_levels in a FilterHandler')
+                ->end()
+                ->validate()
+                    ->ifTrue(function ($v) { return 'filter' === $v['type'] && 'EMERGENCY' !== $v['max_level'] && !empty($v['accepted_levels']); })
+                    ->thenInvalid('You can not use max_level together with accepted_levels in a FilterHandler')
+                ->end()
+            ;
+        }
     }
 
     public function getType(): HandlerType

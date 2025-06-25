@@ -11,11 +11,19 @@ class TelegramHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $this->typeNode($handlerNode)
-            ->children()
-                // TODO: Nodes...
-            ->end()
-        ;
+        static::addOptions($this->typeNode($handlerNode));
+    }
+
+    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    {
+        if($legacy) {
+            $node
+                ->validate()
+                    ->ifTrue(function ($v) { return 'telegram' === $v['type'] && (empty($v['token']) || empty($v['channel'])); })
+                    ->thenInvalid('The token and channel have to be specified to use a TelegramBotHandler')
+                ->end()
+            ;
+        }
     }
 
     public function getType(): HandlerType

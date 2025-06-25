@@ -11,11 +11,19 @@ class SlackbotHandlerConfiguration extends AbstractHandlerConfiguration
 {
     public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $this->typeNode($handlerNode)
-            ->children()
-                // TODO: Nodes...
-            ->end()
-        ;
+        static::addOptions($this->typeNode($handlerNode));
+    }
+
+    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    {
+        if($legacy) {
+            $node
+                ->validate()
+                    ->ifTrue(function ($v) { return 'slackbot' === $v['type'] && (empty($v['team']) || empty($v['token']) || empty($v['channel'])); })
+                    ->thenInvalid('The team, token and channel have to be specified to use a SlackbotHandler')
+                ->end()
+            ;
+        }
     }
 
     public function getType(): HandlerType
