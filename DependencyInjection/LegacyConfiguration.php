@@ -207,6 +207,7 @@ class LegacyConfiguration implements AppendConfigurationInterface
                 ->booleanNode('nested')->defaultFalse()->end()
             ->end();
 
+        GelfHandlerConfiguration::addOptions($handlerNode, true);
         $this->addGelfSection($handlerNode);
         $this->addMongoSection($handlerNode);
         $this->addElasticsearchSection($handlerNode);
@@ -377,11 +378,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
                 ->thenInvalid('The host has to be specified to use a ServerLogHandler')
             ->end()
         ;
-    }
-
-    private function addGelfSection(ArrayNodeDefinition $handerNode)
-    {
-        GelfHandlerConfiguration::addOptions($handerNode);
     }
 
     private function addMongoSection(ArrayNodeDefinition $handerNode)

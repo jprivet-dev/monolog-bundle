@@ -14,7 +14,7 @@ class GelfHandlerConfiguration extends AbstractHandlerConfiguration
         static::addOptions($this->typeNode($handlerNode));
     }
 
-    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void {
+    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void {
         $node
             ->children()
                 ->arrayNode('publisher')
@@ -37,11 +37,16 @@ class GelfHandlerConfiguration extends AbstractHandlerConfiguration
                     ->end()
                 ->end()
             ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'gelf' === $v['type'] && !isset($v['publisher']); })
-                ->thenInvalid('The publisher has to be specified to use a GelfHandler')
-            ->end()
         ;
+
+        if($legacy) {
+              $node
+                ->validate()
+                    ->ifTrue(function ($v) { return 'gelf' === $v['type'] && !isset($v['publisher']); })
+                    ->thenInvalid('The publisher has to be specified to use a GelfHandler')
+                ->end()
+            ;
+        }
     }
 
     public function getType(): HandlerType
