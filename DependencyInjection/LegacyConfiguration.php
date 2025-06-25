@@ -7,8 +7,11 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChannelsHandlerConf
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ElasticsearchHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GelfHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NativeMailerHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PredisHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RedisHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SwiftMailerHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SymfonyMailerHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\VerbosityLevelHandlerConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -217,7 +220,9 @@ class LegacyConfiguration implements AppendConfigurationInterface
         ElasticsearchHandlerConfiguration::addOptions($handlerNode, true);
         RedisHandlerConfiguration::addOptions($handlerNode, true);
         PredisHandlerConfiguration::addOptions($handlerNode, true);
-        $this->addMailerSection($handlerNode);
+        SwiftMailerHandlerConfiguration::addOptions($handlerNode, true);
+        NativeMailerHandlerConfiguration::addOptions($handlerNode, true);
+        SymfonyMailerHandlerConfiguration::addOptions($handlerNode, true);
         VerbosityLevelHandlerConfiguration::addOptions($handlerNode, true);
         ChannelsHandlerConfiguration::addOptions($handlerNode, true);
 
@@ -380,53 +385,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
             ->validate()
                 ->ifTrue(function ($v) { return 'server_log' === $v['type'] && empty($v['host']); })
                 ->thenInvalid('The host has to be specified to use a ServerLogHandler')
-            ->end()
-        ;
-    }
-
-    private function addMailerSection(ArrayNodeDefinition $handerNode)
-    {
-        $handerNode
-            ->children()
-                ->scalarNode('from_email')->end() // swift_mailer, native_mailer, symfony_mailer and flowdock
-                ->arrayNode('to_email') // swift_mailer, native_mailer and symfony_mailer
-                    ->prototype('scalar')->end()
-                    ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) { return [$v]; })
-                    ->end()
-                ->end()
-                ->scalarNode('subject')->end() // swift_mailer, native_mailer and symfony_mailer
-                ->scalarNode('content_type')->defaultNull()->end() // swift_mailer and symfony_mailer
-                ->arrayNode('headers') // native_mailer
-                    ->canBeUnset()
-                    ->scalarPrototype()->end()
-                ->end()
-                ->scalarNode('mailer')->defaultNull()->end() // swift_mailer and symfony_mailer
-                ->arrayNode('email_prototype') // swift_mailer and symfony_mailer
-                    ->canBeUnset()
-                    ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) { return ['id' => $v]; })
-                    ->end()
-                    ->children()
-                        ->scalarNode('id')->isRequired()->end()
-                        ->scalarNode('method')->defaultNull()->end()
-                    ->end()
-                ->end()
-                ->booleanNode('lazy')->defaultValue(true)->end() // swift_mailer
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'swift_mailer' === $v['type'] && empty($v['email_prototype']) && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
-                ->thenInvalid('The sender, recipient and subject or an email prototype have to be specified to use a SwiftMailerHandler')
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'native_mailer' === $v['type'] && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
-                ->thenInvalid('The sender, recipient and subject have to be specified to use a NativeMailerHandler')
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'symfony_mailer' === $v['type'] && empty($v['email_prototype']) && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
-                ->thenInvalid('The sender, recipient and subject or an email prototype have to be specified to use the Symfony MailerHandler')
             ->end()
         ;
     }
