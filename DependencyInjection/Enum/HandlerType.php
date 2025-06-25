@@ -5,6 +5,7 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection\Enum;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\AmqpHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\BrowserconsoleHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\BufferHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChannelsHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChromephpHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ConsoleHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\CubeHandlerConfiguration;
@@ -49,6 +50,7 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SyslogHandlerConfig
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SyslogudpHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\TelegramHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\TestHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\VerbosityLevelHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\WhatfailuregroupHandlerConfiguration;
 
 enum HandlerType: string
@@ -77,6 +79,8 @@ enum HandlerType: string
     case SWIFT_MAILER = 'swift_mailer';
     case NATIVE_MAILER = 'native_mailer';
     case SYMFONY_MAILER = 'symfony_mailer';
+    case VERBOSITY_LEVELS = 'verbosity_levels';
+    case CHANNELS = 'channels';
     case SOCKET = 'socket';
     case PUSHOVER = 'pushover';
     case RAVEN = 'raven';
@@ -129,6 +133,8 @@ enum HandlerType: string
             self::SWIFT_MAILER => SwiftmailerHandlerConfiguration::class,
             self::NATIVE_MAILER => NativemailerHandlerConfiguration::class,
             self::SYMFONY_MAILER => SymfonymailerHandlerConfiguration::class,
+            self::VERBOSITY_LEVELS => VerbosityLevelHandlerConfiguration::class,
+            self::CHANNELS => ChannelsHandlerConfiguration::class,
             self::SOCKET => SocketHandlerConfiguration::class,
             self::PUSHOVER => PushoverHandlerConfiguration::class,
             self::RAVEN => RavenHandlerConfiguration::class,

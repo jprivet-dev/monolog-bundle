@@ -4,8 +4,13 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChannelsHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ElasticsearchHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GelfHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PredisHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RedisHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\VerbosityLevelHandlerConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
@@ -210,12 +215,12 @@ class LegacyConfiguration implements AppendConfigurationInterface
 
         GelfHandlerConfiguration::addOptions($handlerNode, true);
         MongoHandlerConfiguration::addOptions($handlerNode, true);
-        $this->addElasticsearchSection($handlerNode);
-        $this->addRedisSection($handlerNode);
-        $this->addPredisSection($handlerNode);
+        ElasticsearchHandlerConfiguration::addOptions($handlerNode, true);
+        RedisHandlerConfiguration::addOptions($handlerNode, true);
+        PredisHandlerConfiguration::addOptions($handlerNode, true);
         $this->addMailerSection($handlerNode);
-        $this->addVerbosityLevelSection($handlerNode);
-        $this->addChannelsSection($handlerNode);
+        VerbosityLevelHandlerConfiguration::addOptions($handlerNode, true);
+        ChannelsHandlerConfiguration::addOptions($handlerNode, true);
 
         $handlerNode
             ->beforeNormalization()
@@ -380,100 +385,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
         ;
     }
 
-    private function addElasticsearchSection(ArrayNodeDefinition $handerNode)
-    {
-        $handerNode
-            ->children()
-                ->arrayNode('elasticsearch')
-                    ->canBeUnset()
-                    ->beforeNormalization()
-                    ->ifString()
-                    ->then(function ($v) { return ['id' => $v]; })
-                    ->end()
-                    ->children()
-                        ->scalarNode('id')->end()
-                        ->scalarNode('host')->end()
-                        ->scalarNode('port')->defaultValue(9200)->end()
-                        ->scalarNode('transport')->defaultValue('Http')->end()
-                        ->scalarNode('user')->defaultNull()->end()
-                        ->scalarNode('password')->defaultNull()->end()
-                    ->end()
-                    ->validate()
-                    ->ifTrue(function ($v) {
-                        return !isset($v['id']) && !isset($v['host']);
-                    })
-                    ->thenInvalid('What must be set is either the host or the id.')
-                    ->end()
-                ->end()
-                ->scalarNode('index')->defaultValue('monolog')->end() // elasticsearch & elastic_search & elastica
-                ->scalarNode('document_type')->defaultValue('logs')->end() // elasticsearch & elastic_search & elastica
-                ->scalarNode('ignore_error')->defaultValue(false)->end() // elasticsearch & elastic_search & elastica
-            ->end()
-        ;
-    }
-
-    private function addRedisSection(ArrayNodeDefinition $handerNode)
-    {
-        $handerNode
-            ->children()
-                ->arrayNode('redis')
-                    ->canBeUnset()
-                    ->beforeNormalization()
-                    ->ifString()
-                    ->then(function ($v) { return ['id' => $v]; })
-                    ->end()
-                    ->children()
-                        ->scalarNode('id')->end()
-                        ->scalarNode('host')->end()
-                        ->scalarNode('password')->defaultNull()->end()
-                        ->scalarNode('port')->defaultValue(6379)->end()
-                        ->scalarNode('database')->defaultValue(0)->end()
-                        ->scalarNode('key_name')->defaultValue('monolog_redis')->end()
-                    ->end()
-                    ->validate()
-                    ->ifTrue(function ($v) {
-                        return !isset($v['id']) && !isset($v['host']);
-                    })
-                    ->thenInvalid('What must be set is either the host or the service id of the Redis client.')
-                    ->end()
-                ->end()
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'redis' === $v['type'] && empty($v['redis']); })
-                ->thenInvalid('The host has to be specified to use a RedisLogHandler')
-            ->end()
-        ;
-    }
-
-    private function addPredisSection(ArrayNodeDefinition $handerNode)
-    {
-        $handerNode
-            ->children()
-                ->arrayNode('predis')
-                    ->canBeUnset()
-                    ->beforeNormalization()
-                    ->ifString()
-                    ->then(function ($v) { return ['id' => $v]; })
-                    ->end()
-                    ->children()
-                        ->scalarNode('id')->end()
-                        ->scalarNode('host')->end()
-                    ->end()
-                    ->validate()
-                    ->ifTrue(function ($v) {
-                        return !isset($v['id']) && !isset($v['host']);
-                    })
-                    ->thenInvalid('What must be set is either the host or the service id of the Predis client.')
-                    ->end()
-                ->end()
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'predis' === $v['type'] && empty($v['redis']); })
-                ->thenInvalid('The host has to be specified to use a RedisLogHandler')
-            ->end()
-        ;
-    }
-
     private function addMailerSection(ArrayNodeDefinition $handerNode)
     {
         $handerNode
@@ -517,133 +428,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
             ->validate()
                 ->ifTrue(function ($v) { return 'symfony_mailer' === $v['type'] && empty($v['email_prototype']) && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
                 ->thenInvalid('The sender, recipient and subject or an email prototype have to be specified to use the Symfony MailerHandler')
-            ->end()
-        ;
-    }
-
-    private function addVerbosityLevelSection(ArrayNodeDefinition $handerNode)
-    {
-        $handerNode
-            ->children()
-                ->arrayNode('verbosity_levels') // console
-                    ->beforeNormalization()
-                        ->ifArray()
-                        ->then(function ($v) {
-                            $map = [];
-                            $verbosities = ['VERBOSITY_QUIET', 'VERBOSITY_NORMAL', 'VERBOSITY_VERBOSE', 'VERBOSITY_VERY_VERBOSE', 'VERBOSITY_DEBUG'];
-                            // allow numeric indexed array with ascendning verbosity and lowercase names of the constants
-                            foreach ($v as $verbosity => $level) {
-                                if (\is_int($verbosity) && isset($verbosities[$verbosity])) {
-                                    $map[$verbosities[$verbosity]] = strtoupper($level);
-                                } else {
-                                    $map[strtoupper($verbosity)] = strtoupper($level);
-                                }
-                            }
-
-                            return $map;
-                        })
-                    ->end()
-                    ->children()
-                        ->scalarNode('VERBOSITY_QUIET')->defaultValue('ERROR')->end()
-                        ->scalarNode('VERBOSITY_NORMAL')->defaultValue('WARNING')->end()
-                        ->scalarNode('VERBOSITY_VERBOSE')->defaultValue('NOTICE')->end()
-                        ->scalarNode('VERBOSITY_VERY_VERBOSE')->defaultValue('INFO')->end()
-                        ->scalarNode('VERBOSITY_DEBUG')->defaultValue('DEBUG')->end()
-                    ->end()
-                    ->validate()
-                        ->always(function ($v) {
-                            $map = [];
-                            foreach ($v as $verbosity => $level) {
-                                $verbosityConstant = 'Symfony\Component\Console\Output\OutputInterface::'.$verbosity;
-
-                                if (!\defined($verbosityConstant)) {
-                                    throw new InvalidConfigurationException(\sprintf('The configured verbosity "%s" is invalid as it is not defined in Symfony\Component\Console\Output\OutputInterface.', $verbosity));
-                                }
-
-                                try {
-                                    if (Logger::API === 3) {
-                                        $level = Logger::toMonologLevel($level)->value;
-                                    } else {
-                                        $level = Logger::toMonologLevel(is_numeric($level) ? (int) $level : $level);
-                                    }
-                                } catch (\Psr\Log\InvalidArgumentException $e) {
-                                    throw new InvalidConfigurationException(\sprintf('The configured minimum log level "%s" for verbosity "%s" is invalid as it is not defined in Monolog\Logger.', $level, $verbosity));
-                                }
-
-                                $map[\constant($verbosityConstant)] = $level;
-                            }
-
-                            return $map;
-                        })
-                    ->end()
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addChannelsSection(ArrayNodeDefinition $handerNode)
-    {
-        $handerNode
-            ->children()
-                ->arrayNode('channels')
-                    ->fixXmlConfig('channel', 'elements')
-                    ->canBeUnset()
-                    ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) { return ['elements' => [$v]]; })
-                    ->end()
-                    ->beforeNormalization()
-                        ->ifTrue(function ($v) { return \is_array($v) && is_numeric(key($v)); })
-                        ->then(function ($v) { return ['elements' => $v]; })
-                    ->end()
-                    ->validate()
-                        ->ifTrue(function ($v) { return empty($v); })
-                        ->thenUnset()
-                    ->end()
-                    ->validate()
-                        ->always(function ($v) {
-                            $isExclusive = null;
-                            if (isset($v['type'])) {
-                                $isExclusive = 'exclusive' === $v['type'];
-                            }
-
-                            $elements = [];
-                            foreach ($v['elements'] as $element) {
-                                if (0 === strpos($element, '!')) {
-                                    if (false === $isExclusive) {
-                                        throw new InvalidConfigurationException('Cannot combine exclusive/inclusive definitions in channels list.');
-                                    }
-                                    $elements[] = substr($element, 1);
-                                    $isExclusive = true;
-                                } else {
-                                    if (true === $isExclusive) {
-                                        throw new InvalidConfigurationException('Cannot combine exclusive/inclusive definitions in channels list');
-                                    }
-                                    $elements[] = $element;
-                                    $isExclusive = false;
-                                }
-                            }
-
-                            if (!\count($elements)) {
-                                return null;
-                            }
-
-                            // de-duplicating $elements here in case the handlers are redefined, see https://github.com/symfony/monolog-bundle/issues/433
-                            return ['type' => $isExclusive ? 'exclusive' : 'inclusive', 'elements' => array_unique($elements)];
-                        })
-                    ->end()
-                    ->children()
-                        ->scalarNode('type')
-                            ->validate()
-                                ->ifNotInArray(['inclusive', 'exclusive'])
-                                ->thenInvalid('The type of channels has to be inclusive or exclusive')
-                            ->end()
-                        ->end()
-                        ->arrayNode('elements')
-                            ->prototype('scalar')->end()
-                        ->end()
-                    ->end()
-                ->end()
             ->end()
         ;
     }
