@@ -10,11 +10,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class LogglyHandlerConfiguration extends AbstractHandlerConfiguration
 {
-    public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
-    {
-        static::addOptions($this->typeNode($handlerNode));
-    }
-
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
         if($legacy) {

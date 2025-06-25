@@ -10,6 +10,11 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 abstract class AbstractHandlerConfiguration implements AppendConfigurationInterface
 {
+    public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    {
+        static::addOptions($this->typeNode($handlerNode));
+    }
+
     protected function typeNode(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): ArrayNodeDefinition
     {
         return $handlerNode
