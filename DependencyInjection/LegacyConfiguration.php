@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\MonologBundle\DependencyInjection\Handler;
+namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
+class LegacyConfiguration implements AppendConfigurationInterface
 {
     public function __invoke(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
@@ -719,6 +719,6 @@ class LegacyHandlerConfiguration extends AbstractHandlerConfiguration
 
     public function getType(): HandlerType
     {
-        return HandlerType::LEGACY;
+        return HandlerType::SLACK;
     }
 }

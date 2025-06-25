@@ -22,7 +22,6 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GelfHandlerConfigur
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GroupHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\HipchatHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\InsightopsHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LegacyHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogentriesHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogglyHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
@@ -54,7 +53,6 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\WhatfailuregroupHan
 
 enum HandlerType: string
 {
-    case LEGACY = 'legacy';
     case STREAM = 'stream';
     case CONSOLE = 'console';
     case FIREPHP = 'firephp';
@@ -107,7 +105,6 @@ enum HandlerType: string
     public function getHandlerConfigurationClass(): string
     {
         return match ($this) {
-            self::LEGACY => LegacyHandlerConfiguration::class,
             self::STREAM => StreamHandlerConfiguration::class,
             self::CONSOLE => ConsoleHandlerConfiguration::class,
             self::FIREPHP => FirephpHandlerConfiguration::class,
@@ -157,5 +154,10 @@ enum HandlerType: string
             self::SAMPLING => SamplingHandlerConfiguration::class,
             self::SERVICE => ServiceHandlerConfiguration::class,
         };
+    }
+
+    public function withTypePrefix(): string
+    {
+        return 'type_'.$this->value;
     }
 }

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\AbstractHandlerConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -85,17 +84,31 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset();
 
+        $this->appendConfigurationByClass(LegacyConfiguration::class, $handlerNode);
+
         foreach (HandlerType::cases() as $type) {
-            $this->addHandlerConfigurationByType($type, $handlerNode);
+            $this->appendConfigurationByClass($this->getHandlerConfigurationClassByType($type), $handlerNode);
         }
 
         return $treeBuilder;
     }
 
-    /**
-     * Add a handler configuration from a handler type.
-     */
-    public function addHandlerConfigurationByType(HandlerType $type, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlersNode): static
+    private function appendConfigurationByClass(string $class, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlersNode): void
+    {
+        if (!class_exists($class)) {
+            throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
+        }
+
+        $configuration = new $class();
+
+        if (!$configuration instanceof AppendConfigurationInterface) {
+            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AppendConfigurationInterface::class, \get_debug_type($configuration)));
+        }
+
+        $configuration($handlersNode);
+    }
+
+    private function getHandlerConfigurationClassByType(HandlerType $type): string
     {
         $class = $type->getHandlerConfigurationClass();
 
@@ -103,18 +116,6 @@ class Configuration implements ConfigurationInterface
             throw new \RuntimeException(\sprintf('The handler configuration "%s" is not registered.', $type->value));
         }
 
-        if (!class_exists($class)) {
-            throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
-        }
-
-        $configuration = new $class();
-
-        if (!$configuration instanceof AbstractHandlerConfiguration) {
-            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, \get_debug_type($configuration)));
-        }
-
-        $configuration($handlersNode);
-
-        return $this;
+        return $class;
     }
 }
