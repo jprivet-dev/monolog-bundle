@@ -5,6 +5,7 @@ namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GelfHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
@@ -208,8 +209,7 @@ class LegacyConfiguration implements AppendConfigurationInterface
             ->end();
 
         GelfHandlerConfiguration::addOptions($handlerNode, true);
-        $this->addGelfSection($handlerNode);
-        $this->addMongoSection($handlerNode);
+        MongoHandlerConfiguration::addOptions($handlerNode, true);
         $this->addElasticsearchSection($handlerNode);
         $this->addRedisSection($handlerNode);
         $this->addPredisSection($handlerNode);
@@ -376,46 +376,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
             ->validate()
                 ->ifTrue(function ($v) { return 'server_log' === $v['type'] && empty($v['host']); })
                 ->thenInvalid('The host has to be specified to use a ServerLogHandler')
-            ->end()
-        ;
-    }
-
-    private function addMongoSection(ArrayNodeDefinition $handerNode)
-    {
-        $handerNode
-            ->children()
-                ->arrayNode('mongo')
-                    ->canBeUnset()
-                    ->beforeNormalization()
-                    ->ifString()
-                    ->then(function ($v) { return ['id' => $v]; })
-                    ->end()
-                    ->children()
-                        ->scalarNode('id')->end()
-                        ->scalarNode('host')->end()
-                        ->scalarNode('port')->defaultValue(27017)->end()
-                        ->scalarNode('user')->end()
-                        ->scalarNode('pass')->end()
-                        ->scalarNode('database')->defaultValue('monolog')->end()
-                        ->scalarNode('collection')->defaultValue('logs')->end()
-                    ->end()
-                    ->validate()
-                    ->ifTrue(function ($v) {
-                        return !isset($v['id']) && !isset($v['host']);
-                    })
-                    ->thenInvalid('What must be set is either the host or the id.')
-                    ->end()
-                    ->validate()
-                    ->ifTrue(function ($v) {
-                        return isset($v['user']) && !isset($v['pass']);
-                    })
-                    ->thenInvalid('If you set user, you must provide a password.')
-                    ->end()
-                ->end()
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'mongo' === $v['type'] && !isset($v['mongo']); })
-                ->thenInvalid('The mongo configuration has to be specified to use a MongoHandler')
             ->end()
         ;
     }
