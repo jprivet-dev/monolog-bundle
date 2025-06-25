@@ -19,8 +19,8 @@ class FingerscrossedHandlerConfiguration extends AbstractHandlerConfiguration
         if($legacy) {
             $node
                 ->validate()
-                    ->ifTrue(function ($v) { return ('fingers_crossed' === $v['type'] || 'buffer' === $v['type'] || 'filter' === $v['type'] || 'sampling' === $v['type']) && empty($v['handler']); })
-                    ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler or BufferHandler or FilterHandler or SamplingHandler')
+                    ->ifTrue(function ($v) { return 'fingers_crossed' === $v['type'] && empty($v['handler']); })
+                    ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
                 ->end()
                 ->validate()
                     ->ifTrue(function ($v) { return 'fingers_crossed' === $v['type'] && !empty($v['excluded_404s']) && !empty($v['activation_strategy']); })

@@ -16,6 +16,15 @@ class BufferHandlerConfiguration extends AbstractHandlerConfiguration
 
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        if($legacy) {
+            $node
+                ->validate()
+                    ->ifTrue(function ($v) { return 'buffer' === $v['type'] && empty($v['handler']); })
+                    ->thenInvalid('The handler has to be specified to use a BufferHandler')
+                ->end()
+            ;
+        }
+
     }
 
     public function getType(): HandlerType
