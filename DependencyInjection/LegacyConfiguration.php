@@ -431,9 +431,4 @@ class LegacyConfiguration implements AppendConfigurationInterface
             ->end()
         ;
     }
-
-    public function getType(): HandlerType
-    {
-        return HandlerType::SLACK;
-    }
 }
