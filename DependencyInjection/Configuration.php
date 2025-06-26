@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\AbstractHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\HandlerConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -98,46 +98,61 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         foreach (HandlerType::cases() as $type) {
-            $this->appendLegacyConfigurationByClass($this->getHandlerConfigurationClassByType($type), $handlerNode);
+            $this->addCommonOptions($handlerNode);
+            $handlerConfiguration = $this->getHandlerConfigurationByType($type);
+            $handlerConfiguration->addOptions($handlerNode, true);
         }
 
         foreach (HandlerType::cases() as $type) {
-            $this->appendConfigurationByClass($this->getHandlerConfigurationClassByType($type), $handlerNode);
+            $description = sprintf('Define a "%s" handler (one type of handler per name and per environment).'.PHP_EOL.'%s', $type->value, $type->getDescription());
+
+            $typeNode = $handlerNode
+                ->children()
+                    ->arrayNode($type->withTypePrefix())
+                        ->canBeUnset()
+                        ->info($description)
+            ;
+
+            $this->addCommonOptions($typeNode);
+            $handlerConfiguration = $this->getHandlerConfigurationByType($type);
+            $handlerConfiguration->addOptions($typeNode);
         }
 
         return $treeBuilder;
     }
 
-    private function appendLegacyConfigurationByClass(string $class, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    private function addCommonOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
-        if (!class_exists($class)) {
-            throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
-        }
-
-        if (!is_subclass_of($class, AbstractHandlerConfiguration::class)) {
-            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, $class));
-        }
-
-        $class::addCommonOptions($handlerNode, true);
-        $class::addOptions($handlerNode, true);
+        $node
+            ->children()
+                ->scalarNode('priority')
+                    ->defaultValue(0)
+                    ->info('Defines the processing order; handlers with a higher priority value are executed first.')
+                ->end()
+                ->scalarNode('level')
+                    ->defaultValue('DEBUG')
+                    ->info('Level name or int value, defaults to DEBUG.')
+                ->end()
+                ->booleanNode('bubble')
+                    ->defaultTrue()
+                    ->info('When true, messages are passed to the next handler in the stack; when false, the chain ends here.')
+                ->end()
+                ->booleanNode('include_stacktraces')
+                    ->defaultFalse()
+                    ->info('When true, a full stack trace is included in the log record, especially for errors and exceptions.')
+                ->end()
+                ->booleanNode('nested')
+                    ->defaultFalse()
+                    ->info('When true, this handler is part of a nested handler configuration (e.g., as the primary handler of a FingersCrossedHandler).')
+                ->end()
+                ->scalarNode('formatter')
+                    ->info('The formatter used to format the log records. Can be a service ID or a formatter configuration.')
+                ->end()
+            ->end()
+        ;
     }
 
-    private function appendConfigurationByClass(string $class, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlersNode): void
-    {
-        if (!class_exists($class)) {
-            throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
-        }
-
-        $configuration = new $class();
-
-        if (!$configuration instanceof AppendConfigurationInterface) {
-            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AppendConfigurationInterface::class, \get_debug_type($configuration)));
-        }
-
-        $configuration($handlersNode);
-    }
-
-    private function getHandlerConfigurationClassByType(HandlerType $type): string
+    private function getHandlerConfigurationByType(HandlerType $type): HandlerConfigurationInterface
     {
         $class = $type->getHandlerConfigurationClass();
 
@@ -145,6 +160,16 @@ class Configuration implements ConfigurationInterface
             throw new \RuntimeException(\sprintf('The handler configuration "%s" is not registered.', $type->value));
         }
 
-        return $class;
+        if (!class_exists($class)) {
+            throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
+        }
+
+        $handlerConfiguration = new $class();
+
+        if (!$handlerConfiguration instanceof HandlerConfigurationInterface) {
+            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', HandlerConfigurationInterface::class, $class));
+        }
+
+        return $handlerConfiguration;
     }
 }

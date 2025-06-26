@@ -7,14 +7,9 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
-class ElasticaHandlerConfiguration implements HandlerConfigurationInterface
+interface HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
-    {
-    }
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void;
 
-    public function getType(): HandlerType
-    {
-        return HandlerType::ELASTICA;
-    }
+    public function getType(): HandlerType;
 }

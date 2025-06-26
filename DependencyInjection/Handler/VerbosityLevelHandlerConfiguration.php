@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class VerbosityLevelHandlerConfiguration extends AbstractHandlerConfiguration
+class VerbosityLevelHandlerConfiguration implements HandlerConfigurationInterface
 {
-    static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
         $node
             ->children()
