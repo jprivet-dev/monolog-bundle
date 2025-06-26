@@ -11,6 +11,12 @@ class ServiceHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('id')->end() // service
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()
