@@ -23,7 +23,13 @@ abstract class AbstractHandlerConfiguration implements AppendConfigurationInterf
             ->children()
                 ->arrayNode($this->getType()->withTypePrefix())
                     ->canBeUnset()
-                    ->info(sprintf('"%s" type handler (one type of handler per name and per environment).', $this->getType()->value))
+                    ->info(
+                        sprintf(
+                            'Define a "%s" handler (one type of handler per name and per environment).'.PHP_EOL.'%s',
+                            $this->getType()->value,
+                            $this->getType()->getDescription()
+                        )
+                    )
         ;
     }
 
