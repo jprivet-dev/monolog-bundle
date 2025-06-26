@@ -24,13 +24,9 @@ class LegacyConfiguration implements AppendConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('id')->end() // service & rollbar
-                ->scalarNode('priority')->defaultValue(0)->end()
-                ->scalarNode('level')->defaultValue('DEBUG')->end()
-                ->booleanNode('bubble')->defaultTrue()->end()
                 ->scalarNode('app_name')->defaultNull()->end()
                 ->booleanNode('fill_extra_context')->defaultFalse()->end() // sentry
-                ->booleanNode('include_stacktraces')->defaultFalse()->end()
-                ->arrayNode('process_psr_3_messages')
+                ->arrayNode('process_psr_3_messages') // console
                     ->addDefaultsIfNotSet()
                     ->beforeNormalization()
                         ->ifTrue(static function ($v) { return !\is_array($v); })
@@ -185,7 +181,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
                     ->end()
                     ->prototype('scalar')->end()
                 ->end()
-                ->scalarNode('formatter')->end()
                 ->booleanNode('nested')->defaultFalse()->end()
             ->end();
 
@@ -204,6 +199,7 @@ class LegacyConfiguration implements AppendConfigurationInterface
             throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, $class));
         }
 
+        $class::addCommonOptions($handlerNode, $legacy);
         $class::addOptions($handlerNode, $legacy);
     }
 

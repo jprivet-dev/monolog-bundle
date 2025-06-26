@@ -13,11 +13,6 @@ class StreamHandlerConfiguration extends AbstractHandlerConfiguration
     {
         $node
             ->children()
-                ->scalarNode('level')
-                    ->defaultValue('DEBUG')
-                    ->info('Level name or int value, defaults to DEBUG.')
-                ->end()
-                ->booleanNode('bubble')->defaultTrue()->end()
                 ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // stream and rotating
                 ->scalarNode('file_permission')  // stream and rotating
                     ->defaultNull()
@@ -33,10 +28,6 @@ class StreamHandlerConfiguration extends AbstractHandlerConfiguration
                     ->end()
                 ->end()
                 ->booleanNode('use_locking')->defaultFalse()->end() // stream and rotating
-                ->booleanNode('nested')
-                    ->defaultFalse()
-                    ->info('All handlers can also be marked with `nested: true` to make sure they are never added explicitly to the stack.')
-                ->end()
             ->end()
         ;
     }
