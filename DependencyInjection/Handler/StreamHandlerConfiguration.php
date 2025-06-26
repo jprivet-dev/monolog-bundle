@@ -13,8 +13,8 @@ class StreamHandlerConfiguration extends AbstractHandlerConfiguration
     {
         $node
             ->children()
-                ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // stream and rotating
-                ->scalarNode('file_permission')  // stream and rotating
+                ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // stream
+                ->scalarNode('file_permission')  // stream
                     ->defaultNull()
                     ->beforeNormalization()
                         ->ifString()
@@ -27,7 +27,7 @@ class StreamHandlerConfiguration extends AbstractHandlerConfiguration
                         })
                     ->end()
                 ->end()
-                ->booleanNode('use_locking')->defaultFalse()->end() // stream and rotating
+                ->booleanNode('use_locking')->defaultFalse()->end() // stream
             ->end()
         ;
     }

@@ -11,10 +11,13 @@ class SyslogHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
-        if($legacy) {
-            $node
-            ;
-        }
+        $node
+            ->children()
+                ->scalarNode('ident')->defaultFalse()->end() // syslog
+                ->scalarNode('facility')->defaultValue('user')->end() // syslog
+                ->scalarNode('logopts')->defaultValue(\LOG_PID)->end() // syslog
+            ->end()
+        ;
     }
 
     public function getType(): HandlerType

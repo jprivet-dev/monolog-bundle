@@ -11,6 +11,52 @@ class FingerscrossedHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('action_level')->defaultValue('WARNING')->end() // fingers_crossed
+                ->booleanNode('stop_buffering')->defaultTrue()->end()// fingers_crossed
+                ->scalarNode('passthru_level')->defaultNull()->end() // fingers_crossed
+                ->arrayNode('excluded_404s') // fingers_crossed
+                    ->canBeUnset()
+                    ->prototype('scalar')->end()
+                ->end()
+                ->arrayNode('excluded_http_codes') // fingers_crossed
+                    ->canBeUnset()
+                    ->beforeNormalization()
+                        ->always(function ($values) {
+                            return array_map(function ($value) {
+                                /*
+                                 * Allows YAML:
+                                 *   excluded_http_codes: [403, 404, { 400: ['^/foo', '^/bar'] }]
+                                 *
+                                 * and XML:
+                                 *   <monolog:excluded-http-code code="403">
+                                 *     <monolog:url>^/foo</monolog:url>
+                                 *     <monolog:url>^/bar</monolog:url>
+                                 *   </monolog:excluded-http-code>
+                                 *   <monolog:excluded-http-code code="404" />
+                                 */
+
+                                if (\is_array($value)) {
+                                    return isset($value['code']) ? $value : ['code' => key($value), 'urls' => current($value)];
+                                }
+
+                                return ['code' => $value, 'urls' => []];
+                            }, $values);
+                        })
+                    ->end()
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('code')->end()
+                            ->arrayNode('urls')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

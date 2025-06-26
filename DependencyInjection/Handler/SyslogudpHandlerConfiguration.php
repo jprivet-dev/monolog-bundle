@@ -11,6 +11,14 @@ class SyslogudpHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('ident')->defaultFalse()->end() // syslogudp
+                ->scalarNode('facility')->defaultValue('user')->end() // syslogudp
+                ->scalarNode('logopts')->defaultValue(\LOG_PID)->end() // syslogudp
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

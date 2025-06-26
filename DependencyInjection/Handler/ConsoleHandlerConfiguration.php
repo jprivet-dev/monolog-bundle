@@ -11,6 +11,23 @@ class ConsoleHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->arrayNode('process_psr_3_messages') // console
+                    ->addDefaultsIfNotSet()
+                    ->beforeNormalization()
+                        ->ifTrue(static function ($v) { return !\is_array($v); })
+                        ->then(static function ($v) { return ['enabled' => $v]; })
+                    ->end()
+                    ->children()
+                        ->booleanNode('enabled')->defaultNull()->end()
+                        ->scalarNode('date_format')->end()
+                        ->booleanNode('remove_used_context_fields')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->children()

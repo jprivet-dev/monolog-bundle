@@ -11,6 +11,11 @@ class SentryHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->booleanNode('fill_extra_context')->defaultFalse()->end() // sentry
+            ->end();
+
         if($legacy) {
             $node
                 ->validate()
