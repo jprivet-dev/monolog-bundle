@@ -108,13 +108,11 @@ class Configuration implements ConfigurationInterface
         // --- Options by handler configuration ---
 
         foreach (HandlerType::cases() as $type) {
-            $description = sprintf('Define a "%s" handler (one type of handler per name and per environment).'.PHP_EOL.'%s', $type->value, $type->getDescription());
-
             $typeNode = $handlerNode
                 ->children()
                     ->arrayNode($type->withTypePrefix())
                         ->canBeUnset()
-                        ->info($description)
+                        ->info($type->getDescription())
             ;
 
             $this->addCommonOptions($typeNode);
@@ -128,29 +126,12 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->children()
-                ->scalarNode('priority')
-                    ->defaultValue(0)
-                    ->info('Defines the processing order; handlers with a higher priority value are executed first.')
-                ->end()
-                ->scalarNode('level')
-                    ->defaultValue('DEBUG')
-                    ->info('Level name or int value, defaults to DEBUG.')
-                ->end()
-                ->booleanNode('bubble')
-                    ->defaultTrue()
-                    ->info('When true, messages are passed to the next handler in the stack; when false, the chain ends here.')
-                ->end()
-                ->booleanNode('include_stacktraces')
-                    ->defaultFalse()
-                    ->info('When true, a full stack trace is included in the log record, especially for errors and exceptions.')
-                ->end()
-                ->booleanNode('nested')
-                    ->defaultFalse()
-                    ->info('When true, this handler is part of a nested handler configuration (e.g., as the primary handler of a FingersCrossedHandler).')
-                ->end()
-                ->scalarNode('formatter')
-                    ->info('The formatter used to format the log records. Can be a service ID or a formatter configuration.')
-                ->end()
+                ->scalarNode('priority')->defaultValue(0)->info('Defines the processing order; handlers with a higher priority value are executed first.')->end()
+                ->scalarNode('level')->defaultValue('DEBUG')->info('Level name or int value, defaults to DEBUG.')->end()
+                ->booleanNode('bubble')->defaultTrue()->info('When true, messages are passed to the next handler in the stack; when false, the chain ends here.')->end()
+                ->booleanNode('include_stacktraces')->defaultFalse()->info('When true, a full stack trace is included in the log record, especially for errors and exceptions.')->end()
+                ->booleanNode('nested')->defaultFalse()->info('When true, this handler is part of a nested handler configuration (e.g., as the primary handler of a FingersCrossedHandler).')->end()
+                ->scalarNode('formatter')->info('The formatter used to format the log records. Can be a service ID or a formatter configuration.')->end()
             ->end()
         ;
     }
