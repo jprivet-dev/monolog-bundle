@@ -11,6 +11,10 @@ class NewrelicHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('app_name')->defaultNull()->end() // newrelic
+            ->end();
     }
 
     public function getType(): HandlerType

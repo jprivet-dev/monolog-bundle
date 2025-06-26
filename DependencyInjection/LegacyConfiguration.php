@@ -23,7 +23,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
                         ->then(function ($v) { return strtolower($v); })
                     ->end()
                 ->end()
-                ->scalarNode('app_name')->defaultNull()->end() // newrelic
                 ->booleanNode('fill_extra_context')->defaultFalse()->end() // sentry
                 ->arrayNode('process_psr_3_messages') // console
                     ->addDefaultsIfNotSet()
