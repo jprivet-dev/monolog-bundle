@@ -85,6 +85,8 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset();
 
+        // --- Legacy linear options ---
+
         $handlerNode
             ->children()
                 ->scalarNode('type')
@@ -97,11 +99,13 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+
         foreach (HandlerType::cases() as $type) {
             $this->addCommonOptions($handlerNode);
-            $handlerConfiguration = $this->getHandlerConfigurationByType($type);
-            $handlerConfiguration->addOptions($handlerNode, true);
+            $this->getHandlerConfiguration($type)->addOptions($handlerNode, true);
         }
+
+        // --- Options by handler configuration ---
 
         foreach (HandlerType::cases() as $type) {
             $description = sprintf('Define a "%s" handler (one type of handler per name and per environment).'.PHP_EOL.'%s', $type->value, $type->getDescription());
@@ -114,8 +118,7 @@ class Configuration implements ConfigurationInterface
             ;
 
             $this->addCommonOptions($typeNode);
-            $handlerConfiguration = $this->getHandlerConfigurationByType($type);
-            $handlerConfiguration->addOptions($typeNode);
+            $this->getHandlerConfiguration($type)->addOptions($typeNode);
         }
 
         return $treeBuilder;
@@ -152,7 +155,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function getHandlerConfigurationByType(HandlerType $type): HandlerConfigurationInterface
+    private function getHandlerConfiguration(HandlerType $type): HandlerConfigurationInterface
     {
         $class = $type->getHandlerConfigurationClass();
 
