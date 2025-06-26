@@ -24,7 +24,7 @@ class LegacyConfiguration implements AppendConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('id')->end() // service & rollbar
-                ->scalarNode('app_name')->defaultNull()->end()
+                ->scalarNode('app_name')->defaultNull()->end() // newrelic
                 ->booleanNode('fill_extra_context')->defaultFalse()->end() // sentry
                 ->arrayNode('process_psr_3_messages') // console
                     ->addDefaultsIfNotSet()
@@ -181,7 +181,6 @@ class LegacyConfiguration implements AppendConfigurationInterface
                     ->end()
                     ->prototype('scalar')->end()
                 ->end()
-                ->booleanNode('nested')->defaultFalse()->end()
             ->end();
 
         foreach (HandlerType::cases() as $type) {
