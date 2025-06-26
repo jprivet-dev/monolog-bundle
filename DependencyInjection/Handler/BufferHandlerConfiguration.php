@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class BufferHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -18,16 +18,6 @@ class BufferHandlerConfiguration implements HandlerConfigurationInterface
                 ->booleanNode('flush_on_overflow')->defaultFalse()->end() // buffer
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'buffer' === $v['type'] && empty($v['handler']); })
-                    ->thenInvalid('The handler has to be specified to use a BufferHandler')
-                ->end()
-            ;
-        }
-
     }
 
     public function getType(): HandlerType

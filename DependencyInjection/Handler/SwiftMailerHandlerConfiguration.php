@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class SwiftMailerHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -38,15 +38,6 @@ class SwiftMailerHandlerConfiguration implements HandlerConfigurationInterface
                 ->booleanNode('lazy')->defaultValue(true)->end() // swift_mailer
             ->end()
         ;
-
-        if($legacy) {
-              $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'swift_mailer' === $v['type'] && empty($v['email_prototype']) && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
-                    ->thenInvalid('The sender, recipient and subject or an email prototype have to be specified to use a SwiftMailerHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

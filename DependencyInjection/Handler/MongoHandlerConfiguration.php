@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class MongoHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -43,15 +43,6 @@ class MongoHandlerConfiguration implements HandlerConfigurationInterface
                 ->end()
             ->end()
         ;
-
-        if($legacy) {
-              $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'mongo' === $v['type'] && !isset($v['mongo']); })
-                    ->thenInvalid('The mongo configuration has to be specified to use a MongoHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

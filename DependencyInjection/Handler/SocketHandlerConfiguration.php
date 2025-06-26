@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class SocketHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -19,15 +19,6 @@ class SocketHandlerConfiguration implements HandlerConfigurationInterface
                 ->booleanNode('persistent')->end() // socket_handler
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'socket' === $v['type'] && !isset($v['connection_string']); })
-                    ->thenInvalid('The connection_string has to be specified to use a SocketHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

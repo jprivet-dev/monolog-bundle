@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class PredisHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -32,15 +32,6 @@ class PredisHandlerConfiguration implements HandlerConfigurationInterface
                 ->end()
             ->end()
         ;
-
-        if($legacy) {
-              $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'predis' === $v['type'] && empty($v['redis']); })
-                    ->thenInvalid('The host has to be specified to use a RedisLogHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

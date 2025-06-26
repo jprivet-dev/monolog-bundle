@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class InsightopsHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -18,15 +18,6 @@ class InsightopsHandlerConfiguration implements HandlerConfigurationInterface
                 ->booleanNode('use_ssl')->defaultTrue()->end() // insightops
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'insightops' === $v['type'] && empty($v['token']); })
-                    ->thenInvalid('The token has to be specified to use a InsightOpsHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

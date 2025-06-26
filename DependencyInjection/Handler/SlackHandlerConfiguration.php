@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class SlackHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -24,15 +24,6 @@ class SlackHandlerConfiguration implements HandlerConfigurationInterface
                 ->scalarNode('connection_timeout')->end() // slack
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'slack' === $v['type'] && (empty($v['token']) || empty($v['channel'])); })
-                    ->thenInvalid('The token and channel have to be specified to use a SlackHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

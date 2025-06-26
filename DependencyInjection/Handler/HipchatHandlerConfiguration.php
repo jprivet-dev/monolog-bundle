@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class HipchatHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -25,23 +25,6 @@ class HipchatHandlerConfiguration implements HandlerConfigurationInterface
                  ->scalarNode('connection_timeout')->end() // hipchat
            ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'hipchat' === $v['type'] && (empty($v['token']) || empty($v['room'])); })
-                    ->thenInvalid('The token and room have to be specified to use a HipChatHandler')
-                ->end()
-                ->validate()
-                    ->ifTrue(function ($v) { return 'hipchat' === $v['type'] && !\in_array($v['message_format'], ['text', 'html']); })
-                    ->thenInvalid('The message_format has to be "text" or "html" in a HipChatHandler')
-                ->end()
-                ->validate()
-                    ->ifTrue(function ($v) { return 'hipchat' === $v['type'] && null !== $v['api_version'] && !\in_array($v['api_version'], ['v1', 'v2'], true); })
-                    ->thenInvalid('The api_version has to be "v1" or "v2" in a HipChatHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

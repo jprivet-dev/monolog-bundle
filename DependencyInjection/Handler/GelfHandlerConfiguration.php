@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class GelfHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void {
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void {
         $node
             ->children()
                 ->arrayNode('publisher')
@@ -33,15 +33,6 @@ class GelfHandlerConfiguration implements HandlerConfigurationInterface
                 ->end()
             ->end()
         ;
-
-        if($legacy) {
-              $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'gelf' === $v['type'] && !isset($v['publisher']); })
-                    ->thenInvalid('The publisher has to be specified to use a GelfHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

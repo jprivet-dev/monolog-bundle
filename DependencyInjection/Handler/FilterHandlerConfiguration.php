@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class FilterHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -23,23 +23,6 @@ class FilterHandlerConfiguration implements HandlerConfigurationInterface
                 ->scalarNode('max_level')->defaultValue('EMERGENCY')->info('Maximum level to accept (only used if accepted_levels not specified).')->end() // filter
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'filter' === $v['type'] && empty($v['handler']); })
-                    ->thenInvalid('The handler has to be specified to use a FilterHandler')
-                ->end()
-                ->validate()
-                    ->ifTrue(function ($v) { return 'filter' === $v['type'] && 'DEBUG' !== $v['min_level'] && !empty($v['accepted_levels']); })
-                    ->thenInvalid('You can not use min_level together with accepted_levels in a FilterHandler')
-                ->end()
-                ->validate()
-                    ->ifTrue(function ($v) { return 'filter' === $v['type'] && 'EMERGENCY' !== $v['max_level'] && !empty($v['accepted_levels']); })
-                    ->thenInvalid('You can not use max_level together with accepted_levels in a FilterHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

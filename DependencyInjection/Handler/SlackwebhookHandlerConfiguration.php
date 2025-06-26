@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class SlackwebhookHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -22,15 +22,6 @@ class SlackwebhookHandlerConfiguration implements HandlerConfigurationInterface
                 ->scalarNode('webhook_url')->end() // slackwebhook
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'slackwebhook' === $v['type'] && (empty($v['webhook_url'])); })
-                    ->thenInvalid('The webhook_url have to be specified to use a SlackWebhookHandler')
-                ->end()
-            ;
-        }
     }
 
 

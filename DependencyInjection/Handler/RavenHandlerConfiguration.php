@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class RavenHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -20,19 +20,6 @@ class RavenHandlerConfiguration implements HandlerConfigurationInterface
                 ->scalarNode('environment')->defaultNull()->end() // raven_handler
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'sentry' === $v['type'] && !\array_key_exists('dsn', $v) && null === $v['hub_id'] && null === $v['client_id']; })
-                    ->thenInvalid('The DSN has to be specified to use Sentry\'s handler')
-                ->end()
-                ->validate()
-                    ->ifTrue(function ($v) { return 'sentry' === $v['type'] && null !== $v['hub_id'] && null !== $v['client_id']; })
-                    ->thenInvalid('You can not use both a hub_id and a client_id in a Sentry handler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

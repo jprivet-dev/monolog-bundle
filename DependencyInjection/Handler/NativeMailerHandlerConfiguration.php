@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class NativeMailerHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -28,15 +28,6 @@ class NativeMailerHandlerConfiguration implements HandlerConfigurationInterface
                 ->end()
             ->end()
         ;
-
-        if($legacy) {
-              $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'native_mailer' === $v['type'] && (empty($v['from_email']) || empty($v['to_email']) || empty($v['subject'])); })
-                    ->thenInvalid('The sender, recipient and subject have to be specified to use a NativeMailerHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

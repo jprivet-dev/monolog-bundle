@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class SentryHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -20,15 +20,6 @@ class SentryHandlerConfiguration implements HandlerConfigurationInterface
                 ->scalarNode('release')->defaultNull()->end() // sentry
                 ->scalarNode('environment')->defaultNull()->end() // sentry
             ->end();
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'pushover' === $v['type'] && (empty($v['token']) || empty($v['user'])); })
-                    ->thenInvalid('The token and user have to be specified to use a PushoverHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

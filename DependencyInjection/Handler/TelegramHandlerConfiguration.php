@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class TelegramHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
             ->children()
@@ -22,15 +22,6 @@ class TelegramHandlerConfiguration implements HandlerConfigurationInterface
                 ->booleanNode('delay_between_messages')->defaultFalse()->info('Adds a 1sec delay/sleep between sending split messages.')->end() // slack
             ->end()
         ;
-
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'telegram' === $v['type'] && (empty($v['token']) || empty($v['channel'])); })
-                    ->thenInvalid('The token and channel have to be specified to use a TelegramBotHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType

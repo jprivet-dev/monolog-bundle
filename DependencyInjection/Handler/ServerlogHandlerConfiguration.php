@@ -9,16 +9,8 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class ServerlogHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
-        if($legacy) {
-            $node
-                ->validate()
-                    ->ifTrue(function ($v) { return 'server_log' === $v['type'] && empty($v['host']); })
-                    ->thenInvalid('The host has to be specified to use a ServerLogHandler')
-                ->end()
-            ;
-        }
     }
 
     public function getType(): HandlerType
