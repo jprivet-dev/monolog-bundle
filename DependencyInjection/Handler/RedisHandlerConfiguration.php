@@ -19,7 +19,7 @@ class RedisHandlerConfiguration implements HandlerConfigurationInterface
                         ->then(function ($v) { return ['id' => $v]; })
                     ->end()
                     ->children()
-                        ->scalarNode('id')->end()
+                        ->scalarNode('id')->info('Optional if host is given.')->end()
                         ->scalarNode('host')->end()
                         ->scalarNode('password')->defaultNull()->end()
                         ->scalarNode('port')->defaultValue(6379)->end()

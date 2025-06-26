@@ -13,16 +13,18 @@ class FingerscrossedHandlerConfiguration implements HandlerConfigurationInterfac
     {
         $node
             ->children()
-                ->scalarNode('handler')->end() // fingers_crossed
-                ->scalarNode('action_level')->defaultValue('WARNING')->end() // fingers_crossed
-                ->booleanNode('stop_buffering')->defaultTrue()->end()// fingers_crossed
-                ->scalarNode('passthru_level')->defaultNull()->end() // fingers_crossed
+                ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // fingers_crossed
+                ->scalarNode('action_level')->defaultValue('WARNING')->info('Minimum level or service id to activate the handler, defaults to WARNING.')->end() // fingers_crossed
+                ->booleanNode('stop_buffering')->defaultTrue()->info('Bool to disable buffering once the handler has been activated, defaults to true.')->end()// fingers_crossed
+                ->scalarNode('passthru_level')->defaultNull()->info('Level name or int value for messages to always flush, disabled by default.')->end() // fingers_crossed
                 ->arrayNode('excluded_404s') // fingers_crossed
                     ->canBeUnset()
                     ->prototype('scalar')->end()
+                    ->info('If set, the strategy will be changed to one that excludes 404s coming from URLs matching any of those patterns.')
                 ->end()
                 ->arrayNode('excluded_http_codes') // fingers_crossed
                     ->canBeUnset()
+                    ->info('If set, the strategy will be changed to one that excludes specific HTTP codes (requires Symfony Monolog bridge 4.1+).')
                     ->beforeNormalization()
                         ->always(function ($values) {
                             return array_map(function ($value) {
@@ -55,7 +57,7 @@ class FingerscrossedHandlerConfiguration implements HandlerConfigurationInterfac
                         ->end()
                     ->end()
                 ->end()
-                ->scalarNode('buffer_size')->defaultValue(0)->end() // fingers_crossed
+                ->scalarNode('buffer_size')->defaultValue(0)->info('Defaults to 0 (unlimited).')->end() // fingers_crossed
             ->end()
         ;
 

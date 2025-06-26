@@ -14,6 +14,7 @@ class DeduplicationHandlerConfiguration implements HandlerConfigurationInterface
     {
         $node
             ->children()
+                ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // deduplication
                 ->scalarNode('time')->defaultValue(60)->end() // deduplication
                 ->scalarNode('deduplication_level')->defaultValue(Logger::ERROR)->end() // deduplication
                 ->scalarNode('store')->defaultNull()->end() // deduplication

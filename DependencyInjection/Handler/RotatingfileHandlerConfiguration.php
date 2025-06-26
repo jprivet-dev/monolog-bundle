@@ -14,7 +14,7 @@ class RotatingfileHandlerConfiguration implements HandlerConfigurationInterface
         $node
             ->children()
                 ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // rotating
-                ->scalarNode('max_files')->defaultValue(0)->end() // rotating
+                ->scalarNode('max_files')->defaultValue(0)->info('Files to keep, defaults to zero (infinite).')->end() // rotating
                 ->scalarNode('file_permission')  // rotating
                     ->defaultNull()
                     ->beforeNormalization()

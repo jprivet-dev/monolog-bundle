@@ -20,7 +20,7 @@ class ElasticsearchHandlerConfiguration implements HandlerConfigurationInterface
                     ->end()
                     ->children()
                         ->scalarNode('id')->end()
-                        ->scalarNode('host')->end()
+                        ->scalarNode('host')->info('Elastic search host name, with scheme (e.g. "https://127.0.0.1:9200").')->end()
                         ->scalarNode('port')->defaultValue(9200)->end()
                         ->scalarNode('transport')->defaultValue('Http')->end()
                         ->scalarNode('user')->defaultNull()->end()

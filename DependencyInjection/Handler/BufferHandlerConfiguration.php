@@ -13,7 +13,7 @@ class BufferHandlerConfiguration implements HandlerConfigurationInterface
     {
         $node
             ->children()
-                ->scalarNode('handler')->end() // buffer
+                ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // buffer
                 ->scalarNode('buffer_size')->defaultValue(0)->end() // buffer
                 ->booleanNode('flush_on_overflow')->defaultFalse()->end() // buffer
             ->end()

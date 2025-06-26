@@ -13,6 +13,7 @@ class SamplingHandlerConfiguration implements HandlerConfigurationInterface
     {
         $node
             ->children()
+                ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // sampling
                 ->integerNode('factor')->defaultValue(1)->min(1)->end() // sampling
             ->end()
         ;

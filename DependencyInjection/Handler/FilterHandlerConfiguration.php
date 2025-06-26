@@ -13,12 +13,14 @@ class FilterHandlerConfiguration implements HandlerConfigurationInterface
     {
         $node
             ->children()
+                ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // filter
                 ->arrayNode('accepted_levels') // filter
                     ->canBeUnset()
                     ->prototype('scalar')->end()
+                    ->info('List of levels to accept')
                 ->end()
-                ->scalarNode('min_level')->defaultValue('DEBUG')->end() // filter
-                ->scalarNode('max_level')->defaultValue('EMERGENCY')->end() // filter
+                ->scalarNode('min_level')->defaultValue('DEBUG')->info('Minimum level to accept (only used if accepted_levels not specified).')->end() // filter
+                ->scalarNode('max_level')->defaultValue('EMERGENCY')->info('Maximum level to accept (only used if accepted_levels not specified).')->end() // filter
             ->end()
         ;
 

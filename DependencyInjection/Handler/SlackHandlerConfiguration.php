@@ -13,13 +13,13 @@ class SlackHandlerConfiguration implements HandlerConfigurationInterface
     {
         $node
             ->children()
-                ->scalarNode('channel')->defaultNull()->end() // slack
+                ->scalarNode('channel')->defaultNull()->info('Channel name (with starting #).')->end() // slack
                 ->scalarNode('bot_name')->defaultValue('Monolog')->end() // slack
                 ->scalarNode('use_attachment')->defaultTrue()->end() // slack
                 ->scalarNode('use_short_attachment')->defaultFalse()->end() // slack
                 ->scalarNode('include_extra')->defaultFalse()->end() // slack
                 ->scalarNode('icon_emoji')->defaultNull()->end() // slack
-                ->scalarNode('token')->end() // slack
+                ->scalarNode('token')->info('Slack api token')->end() // slack
                 ->scalarNode('timeout')->end() // slack
                 ->scalarNode('connection_timeout')->end() // slack
             ->end()
