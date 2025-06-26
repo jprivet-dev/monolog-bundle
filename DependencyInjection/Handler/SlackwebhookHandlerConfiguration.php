@@ -11,6 +11,18 @@ class SlackwebhookHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('channel')->defaultNull()->end() // slackwebhook
+                ->scalarNode('bot_name')->defaultValue('Monolog')->end() // slackwebhook
+                ->scalarNode('use_attachment')->defaultTrue()->end() // slackwebhook
+                ->scalarNode('use_short_attachment')->defaultFalse()->end() // slackwebhook
+                ->scalarNode('include_extra')->defaultFalse()->end() // slackwebhook
+                ->scalarNode('icon_emoji')->defaultNull()->end() // slackwebhook
+                ->scalarNode('webhook_url')->end() // slackwebhook
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

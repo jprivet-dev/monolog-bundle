@@ -11,6 +11,16 @@ class RavenHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('dsn')->end() // raven_handler
+                ->scalarNode('client_id')->defaultNull()->end() // raven_handler
+                ->scalarNode('auto_log_stacks')->defaultFalse()->end() // raven_handler
+                ->scalarNode('release')->defaultNull()->end() // raven_handler
+                ->scalarNode('environment')->defaultNull()->end() // raven_handler
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

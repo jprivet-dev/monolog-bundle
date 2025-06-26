@@ -13,6 +13,7 @@ class FingerscrossedHandlerConfiguration extends AbstractHandlerConfiguration
     {
         $node
             ->children()
+                ->scalarNode('handler')->end() // fingers_crossed
                 ->scalarNode('action_level')->defaultValue('WARNING')->end() // fingers_crossed
                 ->booleanNode('stop_buffering')->defaultTrue()->end()// fingers_crossed
                 ->scalarNode('passthru_level')->defaultNull()->end() // fingers_crossed
@@ -54,6 +55,7 @@ class FingerscrossedHandlerConfiguration extends AbstractHandlerConfiguration
                         ->end()
                     ->end()
                 ->end()
+                ->scalarNode('buffer_size')->defaultValue(0)->end() // fingers_crossed
             ->end()
         ;
 

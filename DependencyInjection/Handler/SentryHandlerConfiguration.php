@@ -14,6 +14,11 @@ class SentryHandlerConfiguration extends AbstractHandlerConfiguration
         $node
             ->children()
                 ->booleanNode('fill_extra_context')->defaultFalse()->end() // sentry
+                ->scalarNode('dsn')->end() // sentry
+                ->scalarNode('hub_id')->defaultNull()->end() // sentry
+                ->scalarNode('client_id')->defaultNull()->end() // sentry
+                ->scalarNode('release')->defaultNull()->end() // sentry
+                ->scalarNode('environment')->defaultNull()->end() // sentry
             ->end();
 
         if($legacy) {

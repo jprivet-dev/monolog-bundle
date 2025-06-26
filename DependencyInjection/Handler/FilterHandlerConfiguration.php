@@ -11,6 +11,17 @@ class FilterHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->arrayNode('accepted_levels') // filter
+                    ->canBeUnset()
+                    ->prototype('scalar')->end()
+                ->end()
+                ->scalarNode('min_level')->defaultValue('DEBUG')->end() // filter
+                ->scalarNode('max_level')->defaultValue('EMERGENCY')->end() // filter
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

@@ -11,6 +11,15 @@ class WhatfailuregroupHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->arrayNode('members') // whatfailuregroup
+                    ->canBeUnset()
+                    ->performNoDeepMerging()
+                    ->prototype('scalar')->end()
+                ->end()
+            ->end()
+        ;
     }
 
     public function getType(): HandlerType

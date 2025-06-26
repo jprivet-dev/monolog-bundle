@@ -11,6 +11,20 @@ class SlackHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('channel')->defaultNull()->end() // slack
+                ->scalarNode('bot_name')->defaultValue('Monolog')->end() // slack
+                ->scalarNode('use_attachment')->defaultTrue()->end() // slack
+                ->scalarNode('use_short_attachment')->defaultFalse()->end() // slack
+                ->scalarNode('include_extra')->defaultFalse()->end() // slack
+                ->scalarNode('icon_emoji')->defaultNull()->end() // slack
+                ->scalarNode('token')->end() // slack
+                ->scalarNode('timeout')->end() // slack
+                ->scalarNode('connection_timeout')->end() // slack
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

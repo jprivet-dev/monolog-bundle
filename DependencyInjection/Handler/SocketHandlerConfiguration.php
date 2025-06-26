@@ -11,6 +11,15 @@ class SocketHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('connection_string')->end() // socket_handler
+                ->scalarNode('timeout')->end() // socket_handler
+                ->scalarNode('connection_timeout')->end() // socket_handler
+                ->booleanNode('persistent')->end() // socket_handler
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

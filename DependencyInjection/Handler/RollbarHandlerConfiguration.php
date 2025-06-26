@@ -13,7 +13,12 @@ class RollbarHandlerConfiguration extends AbstractHandlerConfiguration
     {
         $node
             ->children()
-                ->scalarNode('id')->end() // service
+                ->scalarNode('id')->end() // rollbar
+                ->scalarNode('token')->end() // rollbar
+                ->arrayNode('config') // rollbar
+                    ->canBeUnset()
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
 

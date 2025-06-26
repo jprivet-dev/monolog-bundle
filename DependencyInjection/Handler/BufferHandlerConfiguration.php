@@ -11,6 +11,14 @@ class BufferHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('handler')->end() // buffer
+                ->scalarNode('buffer_size')->defaultValue(0)->end() // buffer
+                ->booleanNode('flush_on_overflow')->defaultFalse()->end() // buffer
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

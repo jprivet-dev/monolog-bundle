@@ -11,6 +11,21 @@ class HipchatHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('room')->end() // hipchat
+                ->scalarNode('message_format')->defaultValue('text')->end() // hipchat
+                ->scalarNode('api_version')->defaultNull()->end() // hipchat
+                ->scalarNode('notify')->defaultFalse()->end() // hipchat
+                ->scalarNode('nickname')->defaultValue('Monolog')->end() // hipchat
+                ->scalarNode('token')->end() // hipchat
+                ->booleanNode('use_ssl')->defaultTrue()->end() // hipchat
+                ->scalarNode('host')->defaultNull()->end() // hipchat
+                ->scalarNode('timeout')->end() // hipchat
+                 ->scalarNode('connection_timeout')->end() // hipchat
+           ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

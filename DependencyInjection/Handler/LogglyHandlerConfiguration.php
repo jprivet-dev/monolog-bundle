@@ -12,6 +12,23 @@ class LogglyHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('token')->end() // loggly
+                ->arrayNode('tags') // loggly
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function ($v) { return explode(',', $v); })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function ($v) { return array_filter(array_map('trim', $v)); })
+                    ->end()
+                    ->prototype('scalar')->end()
+                ->end()
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

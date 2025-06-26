@@ -11,6 +11,13 @@ class AmqpHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('exchange')->end() // amqp
+                ->scalarNode('exchange_name')->defaultValue('log')->end() // amqp
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

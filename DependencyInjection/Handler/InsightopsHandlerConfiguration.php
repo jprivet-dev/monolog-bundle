@@ -11,6 +11,14 @@ class InsightopsHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('token')->end() // insightops
+                ->scalarNode('region')->end() // insightops
+                ->booleanNode('use_ssl')->defaultTrue()->end() // insightops
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

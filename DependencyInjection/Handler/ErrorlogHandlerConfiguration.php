@@ -11,6 +11,11 @@ class ErrorlogHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('message_type')->defaultValue(0)->end() // error_log
+            ->end()
+        ;
     }
 
     public function getType(): HandlerType

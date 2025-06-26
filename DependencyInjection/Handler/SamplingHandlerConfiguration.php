@@ -11,6 +11,12 @@ class SamplingHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->integerNode('factor')->defaultValue(1)->min(1)->end() // sampling
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

@@ -11,6 +11,13 @@ class FlowdockHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('token')->end() // flowdock
+                ->scalarNode('source')->end() // flowdock
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

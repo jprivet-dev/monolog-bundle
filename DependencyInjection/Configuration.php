@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\AbstractHandlerConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -84,13 +85,41 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset();
 
-        $this->appendConfigurationByClass(LegacyConfiguration::class, $handlerNode);
+        $handlerNode
+            ->children()
+                ->scalarNode('type')
+                    ->isRequired()
+                    ->treatNullLike('null')
+                    ->beforeNormalization()
+                        ->always()
+                        ->then(function ($v) { return strtolower($v); })
+                    ->end()
+                ->end()
+            ->end();
+
+        foreach (HandlerType::cases() as $type) {
+            $this->appendLegacyConfigurationByClass($this->getHandlerConfigurationClassByType($type), $handlerNode);
+        }
 
         foreach (HandlerType::cases() as $type) {
             $this->appendConfigurationByClass($this->getHandlerConfigurationClassByType($type), $handlerNode);
         }
 
         return $treeBuilder;
+    }
+
+    private function appendLegacyConfigurationByClass(string $class, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    {
+        if (!class_exists($class)) {
+            throw new \RuntimeException(\sprintf('The class "%s" does not exist.', $class));
+        }
+
+        if (!is_subclass_of($class, AbstractHandlerConfiguration::class)) {
+            throw new \RuntimeException(\sprintf('Expected class of type "%s", "%s" given', AbstractHandlerConfiguration::class, $class));
+        }
+
+        $class::addCommonOptions($handlerNode, true);
+        $class::addOptions($handlerNode, true);
     }
 
     private function appendConfigurationByClass(string $class, NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlersNode): void

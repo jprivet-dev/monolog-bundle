@@ -16,6 +16,8 @@ class SyslogudpHandlerConfiguration extends AbstractHandlerConfiguration
                 ->scalarNode('ident')->defaultFalse()->end() // syslogudp
                 ->scalarNode('facility')->defaultValue('user')->end() // syslogudp
                 ->scalarNode('logopts')->defaultValue(\LOG_PID)->end() // syslogudp
+                ->scalarNode('host')->defaultNull()->end() // syslogudp
+                ->scalarNode('port')->defaultValue(514)->end() // syslogudp
             ->end()
         ;
 

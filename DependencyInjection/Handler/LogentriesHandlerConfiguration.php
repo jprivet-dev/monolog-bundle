@@ -11,6 +11,15 @@ class LogentriesHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('token')->end() // logentries
+                ->booleanNode('use_ssl')->defaultTrue()->end() // logentries
+                ->scalarNode('timeout')->end() // logentries
+                ->scalarNode('connection_timeout')->end() // logentries
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

@@ -2,6 +2,7 @@
 
 namespace Symfony\Bundle\MonologBundle\DependencyInjection\Handler;
 
+use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -11,6 +12,13 @@ class DeduplicationHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('time')->defaultValue(60)->end() // deduplication
+                ->scalarNode('deduplication_level')->defaultValue(Logger::ERROR)->end() // deduplication
+                ->scalarNode('store')->defaultNull()->end() // deduplication
+           ->end()
+        ;
     }
 
     public function getType(): HandlerType

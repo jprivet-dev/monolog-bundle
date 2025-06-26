@@ -11,6 +11,12 @@ class CubeHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('url')->end() // cube
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()

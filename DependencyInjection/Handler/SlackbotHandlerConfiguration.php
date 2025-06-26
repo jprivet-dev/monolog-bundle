@@ -11,6 +11,14 @@ class SlackbotHandlerConfiguration extends AbstractHandlerConfiguration
 {
     static public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node, bool $legacy = false): void
     {
+        $node
+            ->children()
+                ->scalarNode('channel')->defaultNull()->end() // slackbot
+                ->scalarNode('team')->end() // slackbot
+                ->scalarNode('token')->end() // slackbot
+            ->end()
+        ;
+
         if($legacy) {
             $node
                 ->validate()
