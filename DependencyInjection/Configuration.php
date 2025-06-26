@@ -31,6 +31,10 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * Generates the configuration tree builder.
+     *
+     * This method defines two main configuration structures for handlers:
+     * 1. A legacy, flat structure for backward compatibility (using a 'type' scalar node).
+     * 2. A new, type-prefixed structure (e.g., 'type_stream') for better clarity and explicit handler configuration.
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -85,8 +89,20 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset();
 
-        // --- Legacy linear options ---
 
+        $this->addLegacyHandlerOptions($handlerNode);
+        $this->addNewTypePrefixedHandlerOptions($handlerNode);
+
+        return $treeBuilder;
+    }
+
+    /**
+     * Defines options for handlers using the legacy flat structure.
+     * This allows configuring handlers with a 'type' scalar node directly alongside other options.
+     * E.g., type: stream, path: /path/to/log
+     */
+    protected function addLegacyHandlerOptions($handlerNode): void
+    {
         $handlerNode
             ->children()
                 ->scalarNode('type')
@@ -99,14 +115,15 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
-
+        // Add common and type-specific options directly to the handler prototype for legacy syntax.
+        // The `$legacy = true` flag is passed to handler configurations to indicate this mode.
         foreach (HandlerType::cases() as $type) {
             $this->addCommonOptions($handlerNode);
             $this->getHandlerConfiguration($type)->addOptions($handlerNode, true);
         }
+    }
 
-        // --- Options by handler configuration ---
-
+    private function addNewTypePrefixedHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void {
         foreach (HandlerType::cases() as $type) {
             $typeNode = $handlerNode
                 ->children()
@@ -118,10 +135,12 @@ class Configuration implements ConfigurationInterface
             $this->addCommonOptions($typeNode);
             $this->getHandlerConfiguration($type)->addOptions($typeNode);
         }
-
-        return $treeBuilder;
     }
 
+    /**
+     * Adds common Monolog handler options to the given node.
+     * These options apply to most Monolog handlers regardless of their specific type.
+     */
     private function addCommonOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
     {
         $node
@@ -136,6 +155,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * Retrieves the handler configuration class for a given HandlerType.
+     */
     private function getHandlerConfiguration(HandlerType $type): HandlerConfigurationInterface
     {
         $class = $type->getHandlerConfigurationClass();
