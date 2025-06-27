@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
-use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\HandlerConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -92,6 +91,7 @@ class Configuration implements ConfigurationInterface
                 ->canBeUnset();
 
         $this->addLegacyHandlerOptions($handlerNode);
+        $this->addNewTypePrefixedHandlerOptions($handlerNode);
 
         return $treeBuilder;
     }
@@ -125,13 +125,75 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        // Add common and type-specific options directly to the handler prototype for legacy syntax.
+        $this->addCommonOptions($handlerNode);
+
+        // Add type-specific options directly to the handler prototype for legacy syntax.
         foreach (HandlerType::cases() as $type) {
-            $this->addCommonOptions($handlerNode);
             $this->getHandlerConfiguration($type)->addOptions($handlerNode);
         }
 
+        $this->addCommonValidations($handlerNode);
+    }
+
+    /**
+     * Defines options for handlers using the new type-prefixed structure.
+     * This allows configuring handlers with a nested 'type_xxx' key where options are grouped.
+     * E.g., type_stream: { path: /pa
+     * th/to/log }
+     */
+    private function addNewTypePrefixedHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void {
+        foreach (HandlerType::cases() as $type) {
+            $typeNode = $handlerNode
+                ->children()
+                    ->arrayNode($type->withTypePrefix())
+                        ->canBeUnset()
+                        ->info($type->getDescription())
+                        ->children()
+                            ->scalarNode('type')
+                                ->defaultValue($type->value)
+                                ->cannotBeOverwritten()
+                                ->info('Automatically set by the bundle for internal use and backward compatibility. Do not define this key manually.')
+                            ->end()
+                        ->end()
+            ;
+
+            $this->addCommonOptions($typeNode);
+            $this->getHandlerConfiguration($type)->addOptions($typeNode);
+            $this->addCommonValidations($typeNode);
+        }
+    }
+
+    /**
+     * Adds common Monolog handler options to the given node.
+     * These options apply to most Monolog handlers regardless of their specific type.
+     */
+    private function addCommonOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    {
         $handlerNode
+            ->children()
+                ->scalarNode('priority')->defaultValue(0)->info('Defines the processing order; handlers with a higher priority value are executed first.')->end()
+                ->scalarNode('level')->defaultValue('DEBUG')->info('Level name or int value, defaults to DEBUG.')->end()
+                ->booleanNode('bubble')->defaultTrue()->info('When true, messages are passed to the next handler in the stack; when false, the chain ends here.')->end()
+                ->booleanNode('include_stacktraces')->defaultFalse()->info('When true, a full stack trace is included in the log record, especially for errors and exceptions.')->end()
+                ->booleanNode('nested')->defaultFalse()->info('When true, this handler is part of a nested handler configuration (e.g., as the primary handler of a FingersCrossedHandler).')->end()
+                ->scalarNode('formatter')->info('The formatter used to format the log records. Can be a service ID or a formatter configuration.')->end()
+            ->end()
+        ;
+    }
+
+    /**
+     * Adds common validation rules and normalization to the given handler node.
+     *
+     * This method ensures consistent validation and backward compatibility across
+     * both the legacy (flat) and new (type-prefixed) handler configuration structures.
+     * It handles:
+     * - Deprecated options, ensuring their values are correctly migrated (e.g., 'console_formater_options').
+     * - Incompatible option combinations (e.g., 'service' handler with a 'formatter').
+     * - Missing mandatory options for specific handler types (e.g., 'handler' for 'fingers_crossed').
+     */
+    private function addCommonValidations(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    {
+       $handlerNode
             ->beforeNormalization()
                 ->always(static function ($v) {
                     if (empty($v['console_formatter_options']) && !empty($v['console_formater_options'])) {
@@ -290,44 +352,6 @@ class Configuration implements ConfigurationInterface
             ->validate()
                 ->ifTrue(function ($v) { return 'server_log' === $v['type'] && empty($v['host']); })
                 ->thenInvalid('The host has to be specified to use a ServerLogHandler')
-            ->end()
-        ;
-    }
-
-    /**
-     * Defines options for handlers using the new type-prefixed structure.
-     * This allows configuring handlers with a nested 'type_xxx' key where options are grouped.
-     * E.g., type_stream: { path: /pa
-     * th/to/log }
-     */
-    private function addNewTypePrefixedHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void {
-        foreach (HandlerType::cases() as $type) {
-            $typeNode = $handlerNode
-                ->children()
-                    ->arrayNode($type->withTypePrefix())
-                        ->canBeUnset()
-                        ->info($type->getDescription())
-            ;
-
-            $this->addCommonOptions($typeNode);
-            $this->getHandlerConfiguration($type)->addOptions($handlerNode);
-        }
-    }
-
-    /**
-     * Adds common Monolog handler options to the given node.
-     * These options apply to most Monolog handlers regardless of their specific type.
-     */
-    private function addCommonOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
-    {
-        $node
-            ->children()
-                ->scalarNode('priority')->defaultValue(0)->info('Defines the processing order; handlers with a higher priority value are executed first.')->end()
-                ->scalarNode('level')->defaultValue('DEBUG')->info('Level name or int value, defaults to DEBUG.')->end()
-                ->booleanNode('bubble')->defaultTrue()->info('When true, messages are passed to the next handler in the stack; when false, the chain ends here.')->end()
-                ->booleanNode('include_stacktraces')->defaultFalse()->info('When true, a full stack trace is included in the log record, especially for errors and exceptions.')->end()
-                ->booleanNode('nested')->defaultFalse()->info('When true, this handler is part of a nested handler configuration (e.g., as the primary handler of a FingersCrossedHandler).')->end()
-                ->scalarNode('formatter')->info('The formatter used to format the log records. Can be a service ID or a formatter configuration.')->end()
             ->end()
         ;
     }
