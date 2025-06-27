@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class SyslogudpHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->scalarNode('ident')->defaultFalse()->end() // syslogudp
                 ->scalarNode('facility')->defaultValue('user')->end() // syslogudp

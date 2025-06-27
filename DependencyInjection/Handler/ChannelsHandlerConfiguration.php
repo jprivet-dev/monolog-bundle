@@ -10,9 +10,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ChannelsHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->arrayNode('channels')
                     ->fixXmlConfig('channel', 'elements')

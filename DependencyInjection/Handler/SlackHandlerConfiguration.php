@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class SlackHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->scalarNode('channel')->defaultNull()->info('Channel name (with starting #).')->end() // slack
                 ->scalarNode('bot_name')->defaultValue('Monolog')->end() // slack

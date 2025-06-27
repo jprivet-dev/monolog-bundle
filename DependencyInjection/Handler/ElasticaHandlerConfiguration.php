@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class ElasticaHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-            $node
+        $handlerNode
             ->children()
                 ->arrayNode('elasticsearch')
                     ->canBeUnset()

@@ -9,8 +9,8 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class GelfHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void {
-        $node
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void {
+        $handlerNode
             ->children()
                 ->arrayNode('publisher')
                     ->canBeUnset()
@@ -31,6 +31,10 @@ class GelfHandlerConfiguration implements HandlerConfigurationInterface
                         ->thenInvalid('What must be set is either the hostname or the id.')
                     ->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return 'gelf' === $v['type'] && !isset($v['publisher']); })
+                ->thenInvalid('The publisher has to be specified to use a GelfHandler')
             ->end()
         ;
     }

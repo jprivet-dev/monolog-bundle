@@ -9,8 +9,13 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class ServerlogHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
+        $handlerNode
+            ->children()
+                ->scalarNode('host')->defaultNull()->info('Server log host. ex: 127.0.0.1:9911')->end()
+           ->end()
+        ;
     }
 
     public function getType(): HandlerType

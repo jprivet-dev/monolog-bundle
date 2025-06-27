@@ -9,14 +9,15 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class RedisHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void {
-        $node
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    {
+        $handlerNode
             ->children()
                 ->arrayNode('redis')
                     ->canBeUnset()
                     ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) { return ['id' => $v]; })
+                    ->ifString()
+                    ->then(function ($v) { return ['id' => $v]; })
                     ->end()
                     ->children()
                         ->scalarNode('id')->info('Optional if host is given.')->end()
@@ -27,12 +28,16 @@ class RedisHandlerConfiguration implements HandlerConfigurationInterface
                         ->scalarNode('key_name')->defaultValue('monolog_redis')->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) {
-                            return !isset($v['id']) && !isset($v['host']);
-                        })
-                        ->thenInvalid('What must be set is either the host or the service id of the Redis client.')
+                    ->ifTrue(function ($v) {
+                        return !isset($v['id']) && !isset($v['host']);
+                    })
+                    ->thenInvalid('What must be set is either the host or the service id of the Redis client.')
                     ->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return 'redis' === $v['type'] && empty($v['redis']); })
+                ->thenInvalid('The host has to be specified to use a RedisLogHandler')
             ->end()
         ;
     }

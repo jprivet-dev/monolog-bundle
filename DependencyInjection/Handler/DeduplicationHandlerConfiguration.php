@@ -10,9 +10,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class DeduplicationHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // deduplication
                 ->scalarNode('time')->defaultValue(60)->end() // deduplication

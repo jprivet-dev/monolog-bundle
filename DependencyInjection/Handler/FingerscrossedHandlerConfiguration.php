@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class FingerscrossedHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // fingers_crossed
                 ->scalarNode('action_level')->defaultValue('WARNING')->info('Minimum level or service id to activate the handler, defaults to WARNING.')->end() // fingers_crossed

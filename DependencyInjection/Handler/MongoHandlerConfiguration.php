@@ -9,15 +9,15 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class MongoHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->arrayNode('mongo')
                     ->canBeUnset()
                     ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) { return ['id' => $v]; })
+                    ->ifString()
+                    ->then(function ($v) { return ['id' => $v]; })
                     ->end()
                     ->children()
                         ->scalarNode('id')->end()
@@ -29,18 +29,22 @@ class MongoHandlerConfiguration implements HandlerConfigurationInterface
                         ->scalarNode('collection')->defaultValue('logs')->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) {
-                            return !isset($v['id']) && !isset($v['host']);
-                        })
-                        ->thenInvalid('What must be set is either the host or the id.')
+                    ->ifTrue(function ($v) {
+                        return !isset($v['id']) && !isset($v['host']);
+                    })
+                    ->thenInvalid('What must be set is either the host or the id.')
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) {
-                            return isset($v['user']) && !isset($v['pass']);
-                        })
-                        ->thenInvalid('If you set user, you must provide a password.')
+                    ->ifTrue(function ($v) {
+                        return isset($v['user']) && !isset($v['pass']);
+                    })
+                    ->thenInvalid('If you set user, you must provide a password.')
                     ->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return 'mongo' === $v['type'] && !isset($v['mongo']); })
+                ->thenInvalid('The mongo configuration has to be specified to use a MongoHandler')
             ->end()
         ;
     }

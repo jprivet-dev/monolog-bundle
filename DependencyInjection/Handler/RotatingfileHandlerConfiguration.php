@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class RotatingfileHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end() // rotating
                 ->scalarNode('max_files')->defaultValue(0)->info('Files to keep, defaults to zero (infinite).')->end() // rotating

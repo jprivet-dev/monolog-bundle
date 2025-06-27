@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class RollbarHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->scalarNode('id')->info('RollbarNotifier service (mandatory if token is not provided).')->end() // rollbar
                 ->scalarNode('token')->info('Rollbar api token (skip if you provide a RollbarNotifier service id).')->end() // rollbar

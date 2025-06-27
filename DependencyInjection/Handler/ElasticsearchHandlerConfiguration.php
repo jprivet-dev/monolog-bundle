@@ -9,14 +9,15 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class ElasticsearchHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void {
-        $node
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    {
+        $handlerNode
             ->children()
                 ->arrayNode('elasticsearch')
                     ->canBeUnset()
                     ->beforeNormalization()
-                        ->ifString()
-                        ->then(function ($v) { return ['id' => $v]; })
+                    ->ifString()
+                    ->then(function ($v) { return ['id' => $v]; })
                     ->end()
                     ->children()
                         ->scalarNode('id')->end()
@@ -27,10 +28,10 @@ class ElasticsearchHandlerConfiguration implements HandlerConfigurationInterface
                         ->scalarNode('password')->defaultNull()->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(function ($v) {
-                            return !isset($v['id']) && !isset($v['host']);
-                        })
-                        ->thenInvalid('What must be set is either the host or the id.')
+                    ->ifTrue(function ($v) {
+                        return !isset($v['id']) && !isset($v['host']);
+                    })
+                    ->thenInvalid('What must be set is either the host or the id.')
                     ->end()
                 ->end()
                 ->scalarNode('index')->defaultValue('monolog')->end() // elasticsearch & elastic_search & elastica

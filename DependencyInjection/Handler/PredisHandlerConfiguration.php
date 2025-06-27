@@ -9,9 +9,9 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
 class PredisHandlerConfiguration implements HandlerConfigurationInterface
 {
-    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $node): void
+    public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
-        $node
+        $handlerNode
             ->children()
                 ->arrayNode('predis')
                     ->canBeUnset()
@@ -30,6 +30,10 @@ class PredisHandlerConfiguration implements HandlerConfigurationInterface
                     ->thenInvalid('What must be set is either the host or the service id of the Predis client.')
                     ->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return 'predis' === $v['type'] && empty($v['redis']); })
+                ->thenInvalid('The host has to be specified to use a RedisLogHandler')
             ->end()
         ;
     }
