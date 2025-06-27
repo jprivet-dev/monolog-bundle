@@ -15,6 +15,7 @@ class FingerscrossedHandlerConfiguration implements HandlerConfigurationInterfac
             ->children()
                 ->scalarNode('handler')->info('The wrapped handler\'s name.')->end() // fingers_crossed
                 ->scalarNode('action_level')->defaultValue('WARNING')->info('Minimum level or service id to activate the handler, defaults to WARNING.')->end() // fingers_crossed
+                ->scalarNode('activation_strategy')->defaultNull()->info('Determines when the handler starts processing logs. Can be a log level or a service ID.')->end() // fingers_crossed
                 ->booleanNode('stop_buffering')->defaultTrue()->info('Bool to disable buffering once the handler has been activated, defaults to true.')->end()// fingers_crossed
                 ->scalarNode('passthru_level')->defaultNull()->info('Level name or int value for messages to always flush, disabled by default.')->end() // fingers_crossed
                 ->arrayNode('excluded_404s') // fingers_crossed

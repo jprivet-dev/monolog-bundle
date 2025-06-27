@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
+use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Enum\HandlerType;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\HandlerConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -18,6 +19,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * This class contains the configuration information for the bundle.
@@ -41,7 +43,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('monolog');
         $rootNode = $treeBuilder->getRootNode();
 
-        $handlersNode = $rootNode
+        $handlers = $rootNode
             ->fixXmlConfig('channel')
             ->fixXmlConfig('handler')
             ->children()
@@ -52,7 +54,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('handlers');
 
-        $handlersNode
+        $handlers
             ->canBeUnset()
             ->useAttributeAsKey('name')
             ->validate()
@@ -79,7 +81,7 @@ class Configuration implements ConfigurationInterface
                 ],
             ]);
 
-        $handlerNode = $handlersNode
+        $handlerNode = $handlers
             ->prototype('array')
                 ->fixXmlConfig('member')
                 ->fixXmlConfig('excluded_404')
@@ -89,9 +91,7 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset();
 
-
         $this->addLegacyHandlerOptions($handlerNode);
-        $this->addNewTypePrefixedHandlerOptions($handlerNode);
 
         return $treeBuilder;
     }
@@ -101,7 +101,7 @@ class Configuration implements ConfigurationInterface
      * This allows configuring handlers with a 'type' scalar node directly alongside other options.
      * E.g., type: stream, path: /path/to/log
      */
-    protected function addLegacyHandlerOptions($handlerNode): void
+    protected function addLegacyHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -113,20 +113,30 @@ class Configuration implements ConfigurationInterface
                         ->then(function ($v) { return strtolower($v); })
                     ->end()
                 ->end()
+                // Keep console_formater_options with console_formatter_options in legacy version.
+                ->variableNode('console_formater_options')
+                    ->setDeprecated('symfony/monolog-bundle', 3.7, '"%path%.%node%" is deprecated, use "%path%.console_formatter_options" instead.')
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            return !\is_array($v);
+                        })
+                        ->thenInvalid('The console_formater_options must be an array.')
+                    ->end()
+                ->end()
             ->end();
 
         // Add common and type-specific options directly to the handler prototype for legacy syntax.
-        // The `$legacy = true` flag is passed to handler configurations to indicate this mode.
         foreach (HandlerType::cases() as $type) {
             $this->addCommonOptions($handlerNode);
-            $this->getHandlerConfiguration($type)->addOptions($handlerNode, true);
+            $this->getHandlerConfiguration($type)->addOptions($handlerNode);
         }
     }
 
     /**
      * Defines options for handlers using the new type-prefixed structure.
      * This allows configuring handlers with a nested 'type_xxx' key where options are grouped.
-     * E.g., type_stream: { path: /path/to/log }
+     * E.g., type_stream: { path: /pa
+     * th/to/log }
      */
     private function addNewTypePrefixedHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void {
         foreach (HandlerType::cases() as $type) {
@@ -138,7 +148,7 @@ class Configuration implements ConfigurationInterface
             ;
 
             $this->addCommonOptions($typeNode);
-            $this->getHandlerConfiguration($type)->addOptions($typeNode);
+            $this->getHandlerConfiguration($type)->addOptions($handlerNode);
         }
     }
 
