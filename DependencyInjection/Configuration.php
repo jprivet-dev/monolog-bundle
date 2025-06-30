@@ -138,50 +138,38 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Checks if a handler configuration has multiple handler types defined.
+     * Checks if a handler configuration has multiple handler types defined from different sources (legacy 'type' vs. new 'type_xxx').
+     *
+     * This method is stricter than before, now considering it a conflict if both the legacy 'type' key
+     * and any of the new 'type_xxx' prefixed keys are present, regardless of whether their values match.
+     * The goal is to enforce a single, unambiguous way of defining the handler type.
      *
      * @internal
      */
     public function hasMultipleHandlerTypesConfigured(array $handlerConfig): bool
     {
-        $explicitlyConfiguredTypes = [];
+        $explicitlyConfiguredSources = []; // Will contain 'legacy' and/or 'new'
 
         // Check for the presence of the legacy 'type' key
         if (isset($handlerConfig['type']) && null !== $handlerConfig['type']) {
-            $explicitlyConfiguredTypes[] = ['source' => 'legacy', 'value' => $handlerConfig['type']];
+            $explicitlyConfiguredSources[] = 'legacy';
         }
 
         // Check for the presence of the new 'type_xxx' keys
         foreach (HandlerType::cases() as $typeEnum) {
             $typePrefix = $typeEnum->withTypePrefix();
             if (isset($handlerConfig[$typePrefix])) {
-                $explicitlyConfiguredTypes[] = ['source' => 'new', 'value' => $typeEnum->value];
+                $explicitlyConfiguredSources[] = 'new';
+                // Stop immediately if a new type_xxx key is found.
+                // The presence of any single new key is enough to indicate that
+                // the "new source" of type definition is being used.
+                break;
             }
         }
 
-        // If 0 or 1 explicit type is detected, there's no direct conflict
-        if (count($explicitlyConfiguredTypes) <= 1) {
-            return false;
-        }
-
-        // If exactly 2 types are detected, check if it's the valid auto-fill case (e.g., type_stream: {} which generates type: stream)
-        if (count($explicitlyConfiguredTypes) === 2) {
-            $typeA = $explicitlyConfiguredTypes[0];
-            $typeB = $explicitlyConfiguredTypes[1];
-
-            // If it's a legacy + new combination
-            if (($typeA['source'] === 'legacy' && $typeB['source'] === 'new') || ($typeB['source'] === 'legacy' && $typeA['source'] === 'new')) {
-                // And if the type values are identical (e.g., 'stream' === 'stream')
-                if ($typeA['value'] === $typeB['value']) {
-                    // This is the valid auto-fill case, not a conflict.
-                    return false;
-                }
-            }
-        }
-
-        // In all other scenarios (more than 2 types, or 2 types with different sources/values not handled above),
-        // it's considered a conflict.
-        return true;
+        // If the count of unique type configuration sources is greater than 1, it's a conflict.
+        // This means both 'legacy' and 'new' sources were detected.
+        return \count(\array_unique($explicitlyConfiguredSources)) > 1;
     }
 
     /**
