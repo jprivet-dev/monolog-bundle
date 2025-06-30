@@ -596,6 +596,11 @@ class ConfigurationTest extends TestCase
             ['type' => 'stream', 'type_stream' => []],
             'A handler can only have one type defined. You have configured multiple types: type_stream and the legacy "type: stream" key. Please choose only one handler type (either a "type_xxx" prefixed key or the legacy "type" key).',
         ];
+
+        yield 'Case 5: Conflicting type definitions (legacy "type" and new "type_xxx" with different values) - should fail' => [
+            ['type' => 'stream', 'type_null' => []],
+            'A handler can only have one type defined. You have configured multiple types: type_null and the legacy "type: stream" key. Please choose only one handler type (either a "type_xxx" prefixed key or the legacy "type" key).',
+        ];
     }
 
     protected function processSingleHandlerConfig(array $handlerConfig): array
