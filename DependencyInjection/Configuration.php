@@ -88,12 +88,61 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('tag')
                 ->fixXmlConfig('accepted_level')
                 ->fixXmlConfig('header')
-                ->canBeUnset();
+                ->canBeUnset()
+                ->validate()
+                    ->ifTrue(function ($v) {
+                        return $this->hasMultipleHandlerTypesConfigured($v);
+                    })
+                    ->then(function ($v) {
+                        throw new InvalidConfigurationException($this->getMultipleHandlerTypesErrorMessage($v));
+                    })
+                ->end()
+        ;
 
         $this->addLegacyHandlerOptions($handlerNode);
         $this->addNewTypePrefixedHandlerOptions($handlerNode);
 
         return $treeBuilder;
+    }
+
+    /**
+     * Checks if a handler configuration has multiple handler types defined.
+     */
+    private function hasMultipleHandlerTypesConfigured(array $handlerConfig): bool
+    {
+        $configuredTypePrefixes = [];
+        foreach (HandlerType::cases() as $type) {
+            if (isset($handlerConfig[$type->withTypePrefix()])) {
+                $configuredTypePrefixes[] = $type->withTypePrefix();
+            }
+        }
+
+        // 1. more than one type_xxx is configured (conflict between new syntaxes)
+        // 2. a type_xxx IS configured AND the legacy 'type' key is ALSO configured
+        return (count($configuredTypePrefixes) > 1)
+            || (count($configuredTypePrefixes) > 0 && isset($handlerConfig['type']) && null !== $handlerConfig['type']);
+    }
+
+    /**
+     * Generates a detailed error message when multiple handler types are configured.
+     */
+    private function getMultipleHandlerTypesErrorMessage(array $handlerConfig): string
+    {
+        $configuredTypePrefixes = [];
+        foreach (HandlerType::cases() as $type) {
+            if (isset($handlerConfig[$type->withTypePrefix()])) {
+                $configuredTypePrefixes[] = $type->withTypePrefix();
+            }
+        }
+
+        $message = 'A handler can only have one type defined. You have configured multiple types: ';
+        $message .= implode(', ', $configuredTypePrefixes);
+        if (isset($handlerConfig['type']) && null !== $handlerConfig['type']) {
+            $message .= ' and the legacy "type: '.$handlerConfig['type'].'" key.';
+        }
+        $message .= ' Please choose only one handler type (either a "type_xxx" prefixed key or the legacy "type" key).';
+
+        return $message;
     }
 
     /**
@@ -106,7 +155,7 @@ class Configuration implements ConfigurationInterface
         $handlerNode
             ->children()
                 ->scalarNode('type')
-                    ->isRequired()
+                    ->cannotBeEmpty()
                     ->treatNullLike('null')
                     ->beforeNormalization()
                         ->always()
