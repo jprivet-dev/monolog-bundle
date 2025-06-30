@@ -89,6 +89,29 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('accepted_level')
                 ->fixXmlConfig('header')
                 ->canBeUnset()
+                ->beforeNormalization()
+                    ->always(function (array $handlerConfig) {
+                        foreach (HandlerType::cases() as $typeEnum) {
+                            $typePrefix = $typeEnum->withTypePrefix();
+                            if (isset($handlerConfig[$typePrefix]) && !isset($handlerConfig['type'])) {
+                                if (!is_array($handlerConfig[$typePrefix])) {
+                                    $handlerConfig[$typePrefix] = [];
+                                }
+
+                                $handlerConfig = array_merge($handlerConfig, $handlerConfig[$typePrefix]);
+
+                                unset($handlerConfig[$typePrefix]);
+
+                                if (!isset($handlerConfig['type'])) {
+                                    $handlerConfig['type'] = $typeEnum->value;
+                                }
+                                break;
+                            }
+                        }
+
+                        return $handlerConfig;
+                    })
+                ->end()
                 ->validate()
                     ->ifTrue(function ($handlerConfig) {
                         $legacyTypeIsNotDefined = !isset($handlerConfig['type']);

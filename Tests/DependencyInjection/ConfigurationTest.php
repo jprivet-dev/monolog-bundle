@@ -586,6 +586,11 @@ class ConfigurationTest extends TestCase
             ['type' => 'stream'],
             null,
         ];
+
+        yield 'Case 3: New type_NAME defined - should pass and auto-fill legacy type' => [
+            ['type_stream' => []],
+            null,
+        ];
     }
 
     protected function processSingleHandlerConfig(array $handlerConfig): array
