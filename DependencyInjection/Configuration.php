@@ -90,6 +90,15 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset()
                 ->validate()
+                    ->ifTrue(function ($handlerConfig) {
+                        $legacyTypeIsNotDefined = !isset($handlerConfig['type']);
+                        // TODO: move this validation in HandlerType.
+                        $newTypeXxxIsNotDefined = !array_filter(array_keys($handlerConfig), fn($key) => str_starts_with($key, HandlerType::TYPE_PREFIX));
+                        return $legacyTypeIsNotDefined && $newTypeXxxIsNotDefined;
+                    })
+                    ->thenInvalid('A handler must have a "type" or a "type_NAME" key defined.')
+                ->end()
+                ->validate()
                     ->ifTrue(function ($v) {
                         return $this->hasMultipleHandlerTypesConfigured($v);
                     })
@@ -107,20 +116,49 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Checks if a handler configuration has multiple handler types defined.
+     *
+     * @internal
      */
-    private function hasMultipleHandlerTypesConfigured(array $handlerConfig): bool
+    public function hasMultipleHandlerTypesConfigured(array $handlerConfig): bool
     {
-        $configuredTypePrefixes = [];
-        foreach (HandlerType::cases() as $type) {
-            if (isset($handlerConfig[$type->withTypePrefix()])) {
-                $configuredTypePrefixes[] = $type->withTypePrefix();
+        $explicitlyConfiguredTypes = [];
+
+        // Check for the presence of the legacy 'type' key
+        if (isset($handlerConfig['type']) && null !== $handlerConfig['type']) {
+            $explicitlyConfiguredTypes[] = ['source' => 'legacy', 'value' => $handlerConfig['type']];
+        }
+
+        // Check for the presence of the new 'type_xxx' keys
+        foreach (HandlerType::cases() as $typeEnum) {
+            $typePrefix = $typeEnum->withTypePrefix();
+            if (isset($handlerConfig[$typePrefix])) {
+                $explicitlyConfiguredTypes[] = ['source' => 'new', 'value' => $typeEnum->value];
             }
         }
 
-        // 1. more than one type_xxx is configured (conflict between new syntaxes)
-        // 2. a type_xxx IS configured AND the legacy 'type' key is ALSO configured
-        return (count($configuredTypePrefixes) > 1)
-            || (count($configuredTypePrefixes) > 0 && isset($handlerConfig['type']) && null !== $handlerConfig['type']);
+        // If 0 or 1 explicit type is detected, there's no direct conflict
+        if (count($explicitlyConfiguredTypes) <= 1) {
+            return false;
+        }
+
+        // If exactly 2 types are detected, check if it's the valid auto-fill case (e.g., type_stream: {} which generates type: stream)
+        if (count($explicitlyConfiguredTypes) === 2) {
+            $typeA = $explicitlyConfiguredTypes[0];
+            $typeB = $explicitlyConfiguredTypes[1];
+
+            // If it's a legacy + new combination
+            if (($typeA['source'] === 'legacy' && $typeB['source'] === 'new') || ($typeB['source'] === 'legacy' && $typeA['source'] === 'new')) {
+                // And if the type values are identical (e.g., 'stream' === 'stream')
+                if ($typeA['value'] === $typeB['value']) {
+                    // This is the valid auto-fill case, not a conflict.
+                    return false;
+                }
+            }
+        }
+
+        // In all other scenarios (more than 2 types, or 2 types with different sources/values not handled above),
+        // it's considered a conflict.
+        return true;
     }
 
     /**
@@ -155,11 +193,12 @@ class Configuration implements ConfigurationInterface
         $handlerNode
             ->children()
                 ->scalarNode('type')
+                    ->defaultValue(null)
                     ->cannotBeEmpty()
                     ->treatNullLike('null')
                     ->beforeNormalization()
                         ->always()
-                        ->then(function ($v) { return strtolower($v); })
+                        ->then(function ($v) { return null === $v ? null : strtolower($v); })
                     ->end()
                 ->end()
                 // Keep console_formater_options with console_formatter_options in legacy version.
@@ -190,13 +229,20 @@ class Configuration implements ConfigurationInterface
      * E.g., type_stream: { path: /pa
      * th/to/log }
      */
-    private function addNewTypePrefixedHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void {
+    private function addNewTypePrefixedHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
+    {
         foreach (HandlerType::cases() as $type) {
             $typeNode = $handlerNode
                 ->children()
                     ->arrayNode($type->withTypePrefix())
                         ->canBeUnset()
                         ->info($type->getDescription())
+                        ->beforeNormalization()
+                            ->always(function ($v) use ($type) {
+                                $v['type'] = $type->value;
+                                return $v;
+                            })
+                        ->end()
                         ->children()
                             ->scalarNode('type')
                                 ->defaultValue($type->value)

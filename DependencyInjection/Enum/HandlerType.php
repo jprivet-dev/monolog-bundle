@@ -55,6 +55,8 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\WhatfailuregroupHan
 
 enum HandlerType: string
 {
+    public const TYPE_PREFIX = 'type_';
+
     case AMQP = 'amqp';
     case BROWSER_CONSOLE = 'browser_console';
     case BUFFER = 'buffer';
@@ -232,6 +234,17 @@ enum HandlerType: string
 
     public function withTypePrefix(): string
     {
-        return 'type_'.$this->value;
+        return self::TYPE_PREFIX.$this->value;
+    }
+
+    public static function fromTypePrefix(string $typePrefix): self
+    {
+        if (!str_starts_with($typePrefix, self::TYPE_PREFIX)) {
+            throw new \InvalidArgumentException(\sprintf('The type prefix "%s" does not start with "%s".', $typePrefix, self::TYPE_PREFIX));
+        }
+
+        $value = substr($typePrefix, \strlen(self::TYPE_PREFIX));
+
+        return self::from($value);
     }
 }

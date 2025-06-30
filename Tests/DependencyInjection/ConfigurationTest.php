@@ -556,6 +556,48 @@ class ConfigurationTest extends TestCase
     }
 
     /**
+     * @dataProvider provideHandlerConfigsForTypeCheck
+     */
+    public function testHandlerTypeConfiguration(array $handlerConfig, ?string $expectedExceptionMessage = null): void
+    {
+        if (null !== $expectedExceptionMessage) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expectedExceptionMessage);
+        }
+
+        $config = $this->processSingleHandlerConfig($handlerConfig);
+
+        if (null === $expectedExceptionMessage) {
+            $this->assertArrayHasKey('handlers', $config['monolog']);
+            $this->assertArrayHasKey('test_handler', $config['monolog']['handlers']);
+            $this->assertArrayHasKey('type', $config['monolog']['handlers']['test_handler']);
+            $this->assertNotNull($config['monolog']['handlers']['test_handler']['type']);
+        }
+    }
+
+    public static function provideHandlerConfigsForTypeCheck(): iterable
+    {
+        yield 'Case 1: No type defined - should fail for missing type' => [
+            [],
+            'Invalid configuration for path "monolog.handlers.test_handler": A handler must have a "type" or a "type_NAME" key defined.',
+        ];
+    }
+
+    protected function processSingleHandlerConfig(array $handlerConfig): array
+    {
+        $processor = new Processor();
+        $fullConfig = [
+            'handlers' => [
+                'test_handler' => $handlerConfig,
+            ],
+        ];
+
+        $processedConfiguration = $processor->processConfiguration(new Configuration(), [$fullConfig]);
+
+        return ['monolog' => $processedConfiguration];
+    }
+
+    /**
      * Processes an array of configurations and returns a compiled version.
      *
      * @param array $configs An array of raw configurations
@@ -568,4 +610,5 @@ class ConfigurationTest extends TestCase
 
         return $processor->processConfiguration(new Configuration(), $configs);
     }
+
 }
