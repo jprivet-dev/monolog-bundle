@@ -581,6 +581,11 @@ class ConfigurationTest extends TestCase
             [],
             'Invalid configuration for path "monolog.handlers.test_handler": A handler must have a "type" or a "type_NAME" key defined.',
         ];
+
+        yield 'Case 2: Legacy type defined - should pass' => [
+            ['type' => 'stream'],
+            null,
+        ];
     }
 
     protected function processSingleHandlerConfig(array $handlerConfig): array
