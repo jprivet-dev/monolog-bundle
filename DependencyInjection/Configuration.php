@@ -90,7 +90,7 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset()
                 ->beforeNormalization()
-                    ->always(fn(array $v) => $this->normalizeHandlerTypePrefixOptions($v))
+                    ->always(fn(?array $v) => $this->normalizeHandlerTypePrefixOptions($v))
                 ->end()
                 ->validate()
                     ->ifTrue(fn($v) => $this->isHandlerTypeMissing($v))
@@ -118,8 +118,10 @@ class Configuration implements ConfigurationInterface
      *
      * @internal
      */
-    public function normalizeHandlerTypePrefixOptions(array $handlerConfig): array
+    public function normalizeHandlerTypePrefixOptions(?array $handlerConfig): array
     {
+        $handlerConfig = $handlerConfig ?? [];
+
         foreach (HandlerType::cases() as $typeEnum) {
             $typePrefix = $typeEnum->withTypePrefix();
             // Check if a new type_xxx key is present AND the legacy 'type' key is not already defined.
