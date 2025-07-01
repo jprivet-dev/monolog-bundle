@@ -113,18 +113,11 @@ class Configuration implements ConfigurationInterface
                     })
                 ->end()
                 ->validate()
-                    ->ifTrue(function ($handlerConfig) {
-                        $legacyTypeIsNotDefined = !isset($handlerConfig['type']);
-                        // TODO: move this validation in HandlerType.
-                        $newTypeXxxIsNotDefined = !array_filter(array_keys($handlerConfig), fn($key) => str_starts_with($key, HandlerType::TYPE_PREFIX));
-                        return $legacyTypeIsNotDefined && $newTypeXxxIsNotDefined;
-                    })
+                    ->ifTrue(fn($v) => $this->isHandlerTypeMissing($v))
                     ->thenInvalid('A handler must have a "type" or a "type_NAME" key defined.')
                 ->end()
                 ->validate()
-                    ->ifTrue(function ($v) {
-                        return $this->hasMultipleHandlerTypesConfigured($v);
-                    })
+                    ->ifTrue(fn($v) => $this->hasMultipleHandlerTypesConfigured($v))
                     ->then(function ($v) {
                         throw new InvalidConfigurationException($this->getMultipleHandlerTypesErrorMessage($v));
                     })
@@ -170,6 +163,28 @@ class Configuration implements ConfigurationInterface
         // If the count of unique type configuration sources is greater than 1, it's a conflict.
         // This means both 'legacy' and 'new' sources were detected.
         return \count(\array_unique($explicitlyConfiguredSources)) > 1;
+    }
+
+    /**
+     * Checks if a handler configuration is missing both legacy 'type' and new 'type_xxx' definitions.
+     * TODO: test it.
+     *
+     * @internal
+     */
+    public function isHandlerTypeMissing(array $handlerConfig): bool
+    {
+        $legacyTypeIsNotDefined = empty($handlerConfig['type']);
+        $newTypeXxxIsNotDefined = true;
+
+        foreach (HandlerType::cases() as $typeEnum) {
+            $typePrefix = $typeEnum->withTypePrefix();
+            if (isset($handlerConfig[$typePrefix])) {
+                $newTypeXxxIsNotDefined = false;
+                break;
+            }
+        }
+
+        return $legacyTypeIsNotDefined && $newTypeXxxIsNotDefined;
     }
 
     /**
