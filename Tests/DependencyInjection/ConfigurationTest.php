@@ -556,6 +556,68 @@ class ConfigurationTest extends TestCase
     }
 
     /**
+     * @dataProvider provideHandlerConfigsForTypeCheck
+     */
+    public function testHandlerTypeConfiguration(array $handlerConfig, ?string $expectedExceptionMessage = null): void
+    {
+        if (null !== $expectedExceptionMessage) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expectedExceptionMessage);
+        }
+
+        $config = $this->processSingleHandlerConfig($handlerConfig);
+
+        if (null === $expectedExceptionMessage) {
+            $this->assertArrayHasKey('handlers', $config['monolog']);
+            $this->assertArrayHasKey('test_handler', $config['monolog']['handlers']);
+            $this->assertArrayHasKey('type', $config['monolog']['handlers']['test_handler']);
+            $this->assertNotNull($config['monolog']['handlers']['test_handler']['type']);
+        }
+    }
+
+    public static function provideHandlerConfigsForTypeCheck(): iterable
+    {
+        yield 'Case 1: No type defined - should fail for missing type' => [
+            [],
+            'Invalid configuration for path "monolog.handlers.test_handler": A handler must have a "type" or a "type_NAME" key defined.',
+        ];
+
+        yield 'Case 2: Legacy type defined - should pass' => [
+            ['type' => 'stream'],
+            null,
+        ];
+
+        yield 'Case 3: New type_NAME defined - should pass and auto-fill legacy type' => [
+            ['type_stream' => []],
+            null,
+        ];
+
+        yield 'Case 4: Both type and type_NAME defined, compatible - should fail as conflicting sources' => [
+            ['type' => 'stream', 'type_stream' => []],
+            'A handler can only have one type defined. You have configured multiple types: type_stream and the legacy "type: stream" key. Please choose only one handler type (either a "type_xxx" prefixed key or the legacy "type" key).',
+        ];
+
+        yield 'Case 5: Conflicting type definitions (legacy "type" and new "type_xxx" with different values) - should fail' => [
+            ['type' => 'stream', 'type_null' => []],
+            'A handler can only have one type defined. You have configured multiple types: type_null and the legacy "type: stream" key. Please choose only one handler type (either a "type_xxx" prefixed key or the legacy "type" key).',
+        ];
+    }
+
+    protected function processSingleHandlerConfig(array $handlerConfig): array
+    {
+        $processor = new Processor();
+        $fullConfig = [
+            'handlers' => [
+                'test_handler' => $handlerConfig,
+            ],
+        ];
+
+        $processedConfiguration = $processor->processConfiguration(new Configuration(), [$fullConfig]);
+
+        return ['monolog' => $processedConfiguration];
+    }
+
+    /**
      * Processes an array of configurations and returns a compiled version.
      *
      * @param array $configs An array of raw configurations
@@ -568,4 +630,5 @@ class ConfigurationTest extends TestCase
 
         return $processor->processConfiguration(new Configuration(), $configs);
     }
+
 }
