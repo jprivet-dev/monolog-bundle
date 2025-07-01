@@ -90,27 +90,7 @@ class Configuration implements ConfigurationInterface
                 ->fixXmlConfig('header')
                 ->canBeUnset()
                 ->beforeNormalization()
-                    ->always(function (array $handlerConfig) {
-                        foreach (HandlerType::cases() as $typeEnum) {
-                            $typePrefix = $typeEnum->withTypePrefix();
-                            if (isset($handlerConfig[$typePrefix]) && !isset($handlerConfig['type'])) {
-                                if (!is_array($handlerConfig[$typePrefix])) {
-                                    $handlerConfig[$typePrefix] = [];
-                                }
-
-                                $handlerConfig = array_merge($handlerConfig, $handlerConfig[$typePrefix]);
-
-                                unset($handlerConfig[$typePrefix]);
-
-                                if (!isset($handlerConfig['type'])) {
-                                    $handlerConfig['type'] = $typeEnum->value;
-                                }
-                                break;
-                            }
-                        }
-
-                        return $handlerConfig;
-                    })
+                    ->always(fn(array $v) => $this->normalizeHandlerTypePrefixOptions($v))
                 ->end()
                 ->validate()
                     ->ifTrue(fn($v) => $this->isHandlerTypeMissing($v))
@@ -128,6 +108,49 @@ class Configuration implements ConfigurationInterface
         $this->addNewTypePrefixedHandlerOptions($handlerNode);
 
         return $treeBuilder;
+    }
+
+    /**
+     * Normalizes handler configuration by elevating options from 'type_xxx' prefixed keys
+     * to the main handler level, and setting the 'type' key for backward compatibility.
+     * This method is applied as a `beforeNormalization()->always()` callback on the handler prototype.
+     * TODO: test it.
+     *
+     * @internal
+     */
+    public function normalizeHandlerTypePrefixOptions(array $handlerConfig): array
+    {
+        foreach (HandlerType::cases() as $typeEnum) {
+            $typePrefix = $typeEnum->withTypePrefix();
+            // Check if a new type_xxx key is present AND the legacy 'type' key is not already defined.
+            // If 'type' is already defined, we respect it and don't try to merge from type_xxx,
+            // as this would lead to unexpected overwrites. The `hasMultipleHandlerTypesConfigured` validation
+            // will then catch the conflict if both type sources exist.
+            if (isset($handlerConfig[$typePrefix]) && !isset($handlerConfig['type'])) {
+                // Ensure the prefixed type's value is an array, even if empty, before merging.
+                // This handles cases like `type_stream: ~` or `type_stream: null`.
+                if (!\is_array($handlerConfig[$typePrefix])) {
+                    $handlerConfig[$typePrefix] = [];
+                }
+
+                // Merge the options from the type_xxx key into the main handler config.
+                // The 'type' sub-key, if auto-filled by the type_xxx node's own beforeNormalization,
+                // will be merged here.
+                $handlerConfig = \array_merge($handlerConfig, $handlerConfig[$typePrefix]);
+
+                // Remove the original type_xxx key from the main handler config after merging.
+                unset($handlerConfig[$typePrefix]);
+
+                // Ensure the 'type' key is set, mainly as a fallback or for clarity,
+                // although it should ideally be set by the inner type_xxx node's beforeNormalization.
+                if (!isset($handlerConfig['type'])) {
+                    $handlerConfig['type'] = $typeEnum->value;
+                }
+                break; // Only one type_xxx should be processed per handler
+            }
+        }
+
+        return $handlerConfig;
     }
 
     /**
