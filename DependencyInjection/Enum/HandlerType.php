@@ -28,6 +28,7 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogglyHandlerConfig
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NativeMailerHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NewrelicHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NoopHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NullHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PredisHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PushoverHandlerConfiguration;
@@ -83,6 +84,7 @@ enum HandlerType: string
     case MONGO = 'mongo';
     case NATIVE_MAILER = 'native_mailer';
     case NEWRELIC = 'newrelic';
+    case NOOP = 'noop';
     case NULL = 'null';
     case PREDIS = 'predis';
     case PUSHOVER = 'pushover';
@@ -137,6 +139,7 @@ enum HandlerType: string
             self::MONGO => MongoHandlerConfiguration::class,
             self::NATIVE_MAILER => NativeMailerHandlerConfiguration::class,
             self::NEWRELIC => NewrelicHandlerConfiguration::class,
+            self::NOOP => NoopHandlerConfiguration::class,
             self::NULL => NullHandlerConfiguration::class,
             self::PREDIS => PredisHandlerConfiguration::class,
             self::PUSHOVER => PushoverHandlerConfiguration::class,
@@ -187,6 +190,7 @@ enum HandlerType: string
             self::MONGO => '[Output] Writes log records to a MongoDB database.',
             self::NATIVE_MAILER => '[Output] Sends log records via PHP\'s native mail() function.',
             self::NEWRELIC => '[Output] Sends log records to New Relic.',
+            self::NOOP => '[Output] A placeholder handler that discards all log messages, allowing temporary disablement.',
             self::NULL => '[Output] A handler that permanently discards all log messages.',
             self::PREDIS => '[Output] Writes log records to a Redis server using the Predis library.',
             self::PUSHOVER => '[Output] Sends log records as Pushover notifications.',
