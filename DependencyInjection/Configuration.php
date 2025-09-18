@@ -104,6 +104,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
         ;
 
+
         $this->addLegacyHandlerOptions($handlerNode);
         $this->addNewTypePrefixedHandlerOptions($handlerNode);
 
@@ -277,8 +278,6 @@ class Configuration implements ConfigurationInterface
     /**
      * Defines options for handlers using the new type-prefixed structure.
      * This allows configuring handlers with a nested 'type_xxx' key where options are grouped.
-     * E.g., type_stream: { path: /pa
-     * th/to/log }
      */
     private function addNewTypePrefixedHandlerOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
