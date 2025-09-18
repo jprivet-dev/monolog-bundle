@@ -129,7 +129,7 @@ class Configuration implements ConfigurationInterface
             // If 'type' is already defined, we respect it and don't try to merge from type_xxx,
             // as this would lead to unexpected overwrites. The `hasMultipleHandlerTypesConfigured` validation
             // will then catch the conflict if both type sources exist.
-            if (isset($handlerConfig[$typePrefix]) && !isset($handlerConfig['type'])) {
+            if (key_exists($typePrefix, $handlerConfig) && !key_exists('type', $handlerConfig)) {
                 // Ensure the prefixed type's value is an array, even if empty, before merging.
                 // This handles cases like `type_stream: ~` or `type_stream: null`.
                 if (!\is_array($handlerConfig[$typePrefix])) {
