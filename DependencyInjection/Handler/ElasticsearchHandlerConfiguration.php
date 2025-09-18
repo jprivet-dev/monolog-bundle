@@ -43,6 +43,6 @@ class ElasticsearchHandlerConfiguration implements HandlerConfigurationInterface
 
     public function getType(): HandlerType
     {
-        return HandlerType::ELASTICSEARCH;
+        return HandlerType::ELASTIC_SEARCH;
     }
 }

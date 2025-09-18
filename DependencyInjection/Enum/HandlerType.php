@@ -67,7 +67,7 @@ enum HandlerType: string
     case DEBUG = 'debug';
     case DEDUPLICATION = 'deduplication';
     case ELASTICA = 'elastica';
-    case ELASTICSEARCH = 'elasticsearch';
+    case ELASTIC_SEARCH = 'elastic_search';
     case ERROR_LOG = 'error_log';
     case FALLBACKGROUP = 'fallbackgroup';
     case FILTER = 'filter';
@@ -121,7 +121,7 @@ enum HandlerType: string
             self::DEBUG => DebugHandlerConfiguration::class,
             self::DEDUPLICATION => DeduplicationHandlerConfiguration::class,
             self::ELASTICA => ElasticaHandlerConfiguration::class,
-            self::ELASTICSEARCH => ElasticsearchHandlerConfiguration::class,
+            self::ELASTIC_SEARCH => ElasticsearchHandlerConfiguration::class,
             self::ERROR_LOG => ErrorlogHandlerConfiguration::class,
             self::FALLBACKGROUP => FallbackgroupHandlerConfiguration::class,
             self::FILTER => FilterHandlerConfiguration::class,
@@ -176,7 +176,7 @@ enum HandlerType: string
             self::CHROMEPHP => '[Output] Sends log records to the ChromePHP extension.',
             self::ROTATING_FILE => '[Output] Writes log records to daily rotated files.',
             self::MONGO => '[Output] Writes log records to a MongoDB database.',
-            self::ELASTICSEARCH => '[Output] Writes log records to an Elasticsearch server.',
+            self::ELASTIC_SEARCH => '[Output] Writes log records to an Elasticsearch server.',
             self::ELASTICA => '[Output] Writes log records to an Elasticsearch server using the Elastica client.',
             self::REDIS => '[Output] Writes log records to a Redis server.',
             self::PREDIS => '[Output] Writes log records to a Redis server using Predis.',
