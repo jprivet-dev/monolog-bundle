@@ -568,10 +568,16 @@ class ConfigurationTest extends TestCase
         $config = $this->processSingleHandlerConfig($handlerConfig);
 
         if (null === $expectedExceptionMessage) {
+            /*
+             * monolog:
+             *     handlers:
+             *         test_handler:
+             *             type: stream
+             */
             $this->assertArrayHasKey('handlers', $config['monolog']);
             $this->assertArrayHasKey('test_handler', $config['monolog']['handlers']);
             $this->assertArrayHasKey('type', $config['monolog']['handlers']['test_handler']);
-            $this->assertNotNull($config['monolog']['handlers']['test_handler']['type']);
+            $this->assertSame('stream', $config['monolog']['handlers']['test_handler']['type']);
         }
     }
 
