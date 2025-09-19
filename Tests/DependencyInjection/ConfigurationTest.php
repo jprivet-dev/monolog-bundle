@@ -29,7 +29,7 @@ class ConfigurationTest extends TestCase
     {
         $configs = [
             [
-                'handlers' => ['foobar' => ['type' => 'stream', 'path' => '/foo/bar']],
+                'handlers' => ['foobar' => ['type_stream' => ['path' => '/foo/bar']]],
             ],
         ];
 
@@ -59,9 +59,10 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'foobar' => [
-                        'type' => 'stream',
-                        'path' => '/foo/bar',
-                        'channels' => $string,
+                        'type_stream' => [
+                            'path' => '/foo/bar',
+                            'channels' => $string,
+                        ],
                     ],
                 ],
             ],
@@ -97,8 +98,9 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'gelf' => [
-                        'type' => 'gelf',
-                        'publisher' => $publisher,
+                        'type_gelf' => [
+                            'publisher' => $publisher,
+                        ],
                     ],
                 ],
             ],
@@ -117,14 +119,16 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'foo' => [
-                        'type' => 'stream',
-                        'path' => '/foo',
-                        'channels' => ['A', 'B'],
+                        'type_stream' => [
+                            'path' => '/foo',
+                            'channels' => ['A', 'B'],
+                        ],
                     ],
                     'bar' => [
-                        'type' => 'stream',
-                        'path' => '/foo',
-                        'channels' => ['!C', '!D'],
+                        'type_stream' => [
+                            'path' => '/foo',
+                            'channels' => ['!C', '!D'],
+                        ],
                     ],
                 ],
             ],
@@ -151,9 +155,10 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'foo' => [
-                        'type' => 'stream',
-                        'path' => '/foo',
-                        'channels' => ['A', '!B'],
+                        'type_stream' => [
+                            'path' => '/foo',
+                            'channels' => ['A', '!B'],
+                        ],
                     ],
                 ],
             ],
@@ -170,9 +175,10 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'foo' => [
-                        'type' => 'stream',
-                        'path' => '/foo',
-                        'channels' => 'A',
+                        'type_stream' => [
+                            'path' => '/foo',
+                            'channels' => 'A',
+                        ],
                     ],
                 ],
             ],
@@ -201,14 +207,15 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'swift' => [
-                        'type' => 'swift_mailer',
-                        'from_email' => 'foo@bar.com',
-                        'to_email' => 'foo@bar.com',
-                        'subject' => 'Subject',
-                        'mailer' => 'mailer',
-                        'email_prototype' => [
-                            'id' => 'monolog.prototype',
-                            'method' => 'getPrototype',
+                        'type_swift_mailer' => [
+                            'from_email' => 'foo@bar.com',
+                            'to_email' => 'foo@bar.com',
+                            'subject' => 'Subject',
+                            'mailer' => 'mailer',
+                            'email_prototype' => [
+                                'id' => 'monolog.prototype',
+                                'method' => 'getPrototype',
+                            ],
                         ],
                     ],
                 ],
@@ -230,13 +237,14 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'elasticsearch' => [
-                        'type' => 'elasticsearch',
-                        'elasticsearch' => [
-                            'id' => 'elastica.client',
+                        'type_elastic_search' => [
+                            'elasticsearch' => [
+                                'id' => 'elastica.client',
+                            ],
+                            'index' => 'my-index',
+                            'document_type' => 'my-record',
+                            'ignore_error' => true,
                         ],
-                        'index' => 'my-index',
-                        'document_type' => 'my-record',
-                        'ignore_error' => true,
                     ],
                 ],
             ],
@@ -255,9 +263,10 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'telegram' => [
-                        'type' => 'telegram',
-                        'token' => 'bot-token',
-                        'channel' => '-100',
+                        'type_telegram' => [
+                            'token' => 'bot-token',
+                            'channel' => '-100',
+                        ],
                     ],
                 ],
             ],
@@ -275,11 +284,12 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'console' => [
-                        'type' => 'console',
-                        'verbosity_levels' => [
-                            'VERBOSITY_NORMAL' => 'NOTICE',
-                            'verbosity_verbose' => 'info',
-                            'VERBOSITY_very_VERBOSE' => '200',
+                        'type_console' => [
+                            'verbosity_levels' => [
+                                'VERBOSITY_NORMAL' => 'NOTICE',
+                                'verbosity_verbose' => 'info',
+                                'VERBOSITY_very_VERBOSE' => '200',
+                            ],
                         ],
                     ],
                 ],
@@ -304,11 +314,12 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'foo' => [
-                        'type' => 'stream',
-                        'path' => '/foo',
-                        'channels' => [
-                            'type' => 'inclusive',
-                            'elements' => ['A', 'B'],
+                        'type_stream' => [
+                            'path' => '/foo',
+                            'channels' => [
+                                'type' => 'inclusive',
+                                'elements' => ['A', 'B'],
+                            ],
                         ],
                     ],
                 ],
@@ -330,14 +341,16 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'foo' => [
-                        'type' => 'stream',
-                        'path' => '/foo',
-                        'file_permission' => '0666',
+                        'type_stream' => [
+                            'path' => '/foo',
+                            'file_permission' => '0666',
+                        ],
                     ],
                     'bar' => [
-                        'type' => 'stream',
-                        'path' => '/bar',
-                        'file_permission' => 0777,
+                        'type_stream' => [
+                            'path' => '/bar',
+                            'file_permission' => 0777,
+                        ],
                     ],
                 ],
             ],
@@ -355,14 +368,16 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'foo' => [
-                        'type' => 'stream',
-                        'path' => '/foo',
-                        'use_locking' => false,
+                        'type_stream' => [
+                            'path' => '/foo',
+                            'use_locking' => false,
+                        ],
                     ],
                     'bar' => [
-                        'type' => 'rotating_file',
-                        'path' => '/bar',
-                        'use_locking' => true,
+                        'type_rotating_file' => [
+                            'path' => '/bar',
+                            'use_locking' => true,
+                        ]
                     ],
                 ],
             ],
@@ -378,7 +393,7 @@ class ConfigurationTest extends TestCase
     {
         $configs = [
             [
-                'handlers' => ['foobar' => ['type' => 'stream', 'path' => '/foo/bar', 'nested' => true]],
+                'handlers' => ['foobar' => ['type_stream' => ['path' => '/foo/bar', 'nested' => true]]],
             ],
         ];
 
@@ -393,13 +408,14 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'redis' => [
-                        'type' => 'redis',
-                        'redis' => [
-                            'host' => '127.0.1.1',
-                            'password' => 'pa$$w0rd',
-                            'port' => 1234,
-                            'database' => 1,
-                            'key_name' => 'monolog_redis_test',
+                        'type_redis' => [
+                            'redis' => [
+                                'host' => '127.0.1.1',
+                                'password' => 'pa$$w0rd',
+                                'port' => 1234,
+                                'database' => 1,
+                                'key_name' => 'monolog_redis_test',
+                            ],
                         ],
                     ],
                 ],
@@ -417,10 +433,11 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'redis' => [
-                        'type' => 'predis',
-                        'redis' => [
-                            'host' => '127.0.1.1',
-                            'key_name' => 'monolog_redis_test',
+                        'type_predis' => [
+                            'redis' => [
+                                'host' => '127.0.1.1',
+                                'key_name' => 'monolog_redis_test',
+                            ],
                         ],
                     ],
                 ],
@@ -441,47 +458,56 @@ class ConfigurationTest extends TestCase
             [
                 'handlers' => [
                     'old' => [
-                        'type' => 'console',
-                        'console_formater_options' => ['foo' => 'foo'],
+                        'type_console' => [
+                            'console_formater_options' => ['foo' => 'foo'],
+                        ],
                     ],
                     'old2' => [
-                        'type' => 'console',
-                        'console_formater_options' => ['foo' => 'foo'],
+                        'type_console' => [
+                            'console_formater_options' => ['foo' => 'foo'],
+                        ],
                     ],
                     'new' => [
-                        'type' => 'console',
-                        'console_formatter_options' => ['bar' => 'bar'],
+                        'type_console' => [
+                            'console_formatter_options' => ['bar' => 'bar'],
+                        ],
                     ],
                     'new2' => [
-                        'type' => 'console',
-                        'console_formatter_options' => ['bar' => 'bar'],
+                        'type_console' => [
+                            'console_formatter_options' => ['bar' => 'bar'],
+                        ],
                     ],
                     'both' => [
-                        'type' => 'console',
-                        'console_formater_options' => ['foo' => 'foo'],
-                        'console_formatter_options' => ['bar' => 'bar'],
+                        'type_console' => [
+                            'console_formater_options' => ['foo' => 'foo'],
+                            'console_formatter_options' => ['bar' => 'bar'],
+                        ],
                     ],
                     'both2' => [
-                        'type' => 'console',
-                        'console_formater_options' => ['foo' => 'foo'],
-                        'console_formatter_options' => ['bar' => 'bar'],
+                        'type_console' => [
+                            'console_formater_options' => ['foo' => 'foo'],
+                            'console_formatter_options' => ['bar' => 'bar'],
+                        ],
                     ],
                 ],
             ],
             [
                 'handlers' => [
                     'old2' => [
-                        'type' => 'console',
-                        'console_formater_options' => ['baz' => 'baz'],
+                        'type_console' => [
+                            'console_formater_options' => ['baz' => 'baz'],
+                        ],
                     ],
                     'new2' => [
-                        'type' => 'console',
-                        'console_formatter_options' => ['qux' => 'qux'],
+                        'type_console' => [
+                            'console_formatter_options' => ['qux' => 'qux'],
+                        ],
                     ],
                     'both2' => [
-                        'type' => 'console',
-                        'console_formater_options' => ['baz' => 'baz'],
-                        'console_formatter_options' => ['qux' => 'qux'],
+                        'type_console' => [
+                            'console_formater_options' => ['baz' => 'baz'],
+                            'console_formatter_options' => ['qux' => 'qux'],
+                        ],
                     ],
                 ],
             ],
@@ -522,7 +548,7 @@ class ConfigurationTest extends TestCase
         $configs = [
             [
                 'handlers' => [
-                    'main' => ['type' => 'stream'] + $configuration,
+                    'main' => ['type_stream' => $configuration],
                 ],
             ],
         ];
@@ -553,6 +579,74 @@ class ConfigurationTest extends TestCase
             ['process_psr_3_messages' => ['enabled' => false, 'remove_used_context_fields' => true]],
             ['enabled' => false, 'remove_used_context_fields' => true],
         ];
+    }
+
+    /**
+     * @dataProvider provideHandlerConfigsForTypeCheck
+     */
+    public function testHandlerTypeConfiguration(array $handlerConfig, ?string $expectedExceptionMessage = null): void
+    {
+        if (null !== $expectedExceptionMessage) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expectedExceptionMessage);
+        }
+
+        $config = $this->processSingleHandlerConfig($handlerConfig);
+
+        if (null === $expectedExceptionMessage) {
+            /*
+             * monolog:
+             *     handlers:
+             *         test_handler:
+             *             type: stream
+             */
+            $this->assertArrayHasKey('handlers', $config['monolog']);
+            $this->assertArrayHasKey('test_handler', $config['monolog']['handlers']);
+            $this->assertArrayHasKey('type', $config['monolog']['handlers']['test_handler']);
+            $this->assertSame('stream', $config['monolog']['handlers']['test_handler']['type']);
+        }
+    }
+
+    public static function provideHandlerConfigsForTypeCheck(): iterable
+    {
+        yield 'Case 1: No type defined - should fail for missing type' => [
+            [],
+            'Invalid configuration for path "monolog.handlers.test_handler": A handler must have a "type" or a "type_NAME" key defined.',
+        ];
+
+        yield 'Case 2: Legacy type defined - should pass' => [
+            ['type' => 'stream'],
+            null,
+        ];
+
+        yield 'Case 3: New type_NAME defined - should pass and auto-fill legacy type' => [
+            ['type_stream' => []],
+            null,
+        ];
+
+        yield 'Case 4: Both type and type_NAME defined, compatible - should fail as conflicting sources' => [
+            ['type' => 'stream', 'type_stream' => []],
+            'A handler can only have one type defined. You have configured multiple types: type_stream and the legacy "type: stream" key. Please choose only one handler type (either a "type_xxx" prefixed key or the legacy "type" key).',
+        ];
+
+        yield 'Case 5: Conflicting type definitions (legacy "type" and new "type_xxx" with different values) - should fail' => [
+            ['type' => 'stream', 'type_null' => []],
+            'A handler can only have one type defined. You have configured multiple types: type_null and the legacy "type: stream" key. Please choose only one handler type (either a "type_xxx" prefixed key or the legacy "type" key).',
+        ];
+    }
+
+    protected function processSingleHandlerConfig(array $handlerConfig): array
+    {
+        $processor = new Processor();
+        $fullConfig = [
+            'handlers' => [
+                'test_handler' => $handlerConfig,
+            ],
+        ];
+
+        $processedConfiguration = $processor->processConfiguration(new Configuration(), [$fullConfig]);
+
+        return ['monolog' => $processedConfiguration];
     }
 
     /**

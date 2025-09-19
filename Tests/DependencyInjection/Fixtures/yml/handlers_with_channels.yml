@@ -18,30 +18,30 @@ services:
 monolog:
     handlers:
         custom:
-            type: stream
-            path: /tmp/symfony.log
-            bubble: false
-            level: ERROR
-            channels: foo
+            type_stream:
+                path: /tmp/symfony.log
+                bubble: false
+                level: ERROR
+                channels: foo
         main:
-            type: group
-            members: [nested]
-            channels: ["!foo", "!bar"]
+            type_group:
+                members: [nested]
+                channels: ["!foo", "!bar"]
         nested:
-            type: stream
+            type_stream: ~
         extra:
-            type: syslog
-            ident: monolog
-            facility: user
-            level: ALERT
+            type_syslog:
+                ident: monolog
+                facility: user
+                level: ALERT
         more:
-            type: native_mailer
-            to_email: monitoring@example.org
-            from_email: webmaster@example.org
-            subject: Monolog report
-            level: CRITICAL
-            channels:
-                type: inclusive
-                elements:
-                    - security
-                    - doctrine
+            type_native_mailer:
+                to_email: monitoring@example.org
+                from_email: webmaster@example.org
+                subject: Monolog report
+                level: CRITICAL
+                channels:
+                    type: inclusive
+                    elements:
+                        - security
+                        - doctrine
