@@ -7,19 +7,23 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
-class ErrorlogHandlerConfiguration implements HandlerConfigurationInterface
+class FallbackGroupHandlerConfiguration implements HandlerConfigurationInterface
 {
     public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
-                ->scalarNode('message_type')->defaultValue(0)->end() // error_log
+                ->arrayNode('members') // fallbackgroup
+                    ->canBeUnset()
+                    ->performNoDeepMerging()
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
-    }
+  }
 
     public function getType(): HandlerType
     {
-        return HandlerType::ERROR_LOG;
+        return HandlerType::FALLBACKGROUP;
     }
 }

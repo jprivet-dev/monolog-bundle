@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
-class BrowserconsoleHandlerConfiguration implements HandlerConfigurationInterface
+class ChromePHPHandlerConfiguration implements HandlerConfigurationInterface
 {
     public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {
@@ -15,6 +15,6 @@ class BrowserconsoleHandlerConfiguration implements HandlerConfigurationInterfac
 
     public function getType(): HandlerType
     {
-        return HandlerType::BROWSER_CONSOLE;
+        return HandlerType::CHROMEPHP;
     }
 }

@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 
-class SlackwebhookHandlerConfiguration implements HandlerConfigurationInterface
+class SlackWebhookHandlerConfiguration implements HandlerConfigurationInterface
 {
     public function addOptions(NodeDefinition|ArrayNodeDefinition|VariableNodeDefinition $handlerNode): void
     {

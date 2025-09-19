@@ -3,31 +3,31 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection\Enum;
 
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\AmqpHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\BrowserconsoleHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\BrowserConsoleHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\BufferHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChannelsHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChromephpHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ChromePHPHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ConsoleHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\CubeHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\DebugHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\DeduplicationHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ElasticaHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ElasticsearchHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ErrorlogHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FallbackgroupHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ErrorLogHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FallbackGroupHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FilterHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FingerscrossedHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FirephpHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FingersCrossedHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FirePHPHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\FlowdockHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GelfHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\GroupHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\HipchatHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\InsightopsHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogentriesHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\InsightOpsHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogEntriesHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\LogglyHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\MongoHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NativeMailerHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NewrelicHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NewRelicHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NoopHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\NullHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PredisHandlerConfiguration;
@@ -35,24 +35,24 @@ use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\PushoverHandlerConf
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RavenHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RedisHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RollbarHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RotatingfileHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\RotatingFileHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SamplingHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SentryHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ServerlogHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\ServiceHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackbotHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackwebhookHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SlackWebhookHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SocketHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\StreamHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SwiftMailerHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SymfonyMailerHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SyslogHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SyslogudpHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\TelegramHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\SysLogUdpHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\TelegramBotHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\TestHandlerConfiguration;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\VerbosityLevelHandlerConfiguration;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\WhatfailuregroupHandlerConfiguration;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Handler\WhatFailureGroupHandlerConfiguration;
 
 enum HandlerType: string
 {
@@ -114,31 +114,31 @@ enum HandlerType: string
     {
         return match ($this) {
             self::AMQP => AmqpHandlerConfiguration::class,
-            self::BROWSER_CONSOLE => BrowserconsoleHandlerConfiguration::class,
+            self::BROWSER_CONSOLE => BrowserConsoleHandlerConfiguration::class,
             self::BUFFER => BufferHandlerConfiguration::class,
             self::CHANNELS => ChannelsHandlerConfiguration::class,
-            self::CHROMEPHP => ChromephpHandlerConfiguration::class,
+            self::CHROMEPHP => ChromePHPHandlerConfiguration::class,
             self::CONSOLE => ConsoleHandlerConfiguration::class,
             self::CUBE => CubeHandlerConfiguration::class,
             self::DEBUG => DebugHandlerConfiguration::class,
             self::DEDUPLICATION => DeduplicationHandlerConfiguration::class,
             self::ELASTICA => ElasticaHandlerConfiguration::class,
             self::ELASTIC_SEARCH => ElasticsearchHandlerConfiguration::class,
-            self::ERROR_LOG => ErrorlogHandlerConfiguration::class,
-            self::FALLBACKGROUP => FallbackgroupHandlerConfiguration::class,
+            self::ERROR_LOG => ErrorLogHandlerConfiguration::class,
+            self::FALLBACKGROUP => FallbackGroupHandlerConfiguration::class,
             self::FILTER => FilterHandlerConfiguration::class,
-            self::FINGERS_CROSSED => FingerscrossedHandlerConfiguration::class,
-            self::FIREPHP => FirephpHandlerConfiguration::class,
+            self::FINGERS_CROSSED => FingersCrossedHandlerConfiguration::class,
+            self::FIREPHP => FirePHPHandlerConfiguration::class,
             self::FLOWDOCK => FlowdockHandlerConfiguration::class,
             self::GELF => GelfHandlerConfiguration::class,
             self::GROUP => GroupHandlerConfiguration::class,
             self::HIPCHAT => HipchatHandlerConfiguration::class,
-            self::INSIGHTOPS => InsightopsHandlerConfiguration::class,
-            self::LOGENTRIES => LogentriesHandlerConfiguration::class,
+            self::INSIGHTOPS => InsightOpsHandlerConfiguration::class,
+            self::LOGENTRIES => LogEntriesHandlerConfiguration::class,
             self::LOGGLY => LogglyHandlerConfiguration::class,
             self::MONGO => MongoHandlerConfiguration::class,
             self::NATIVE_MAILER => NativeMailerHandlerConfiguration::class,
-            self::NEWRELIC => NewrelicHandlerConfiguration::class,
+            self::NEWRELIC => NewRelicHandlerConfiguration::class,
             self::NOOP => NoopHandlerConfiguration::class,
             self::NULL => NullHandlerConfiguration::class,
             self::PREDIS => PredisHandlerConfiguration::class,
@@ -146,24 +146,24 @@ enum HandlerType: string
             self::RAVEN => RavenHandlerConfiguration::class,
             self::REDIS => RedisHandlerConfiguration::class,
             self::ROLLBAR => RollbarHandlerConfiguration::class,
-            self::ROTATING_FILE => RotatingfileHandlerConfiguration::class,
+            self::ROTATING_FILE => RotatingFileHandlerConfiguration::class,
             self::SAMPLING => SamplingHandlerConfiguration::class,
             self::SENTRY => SentryHandlerConfiguration::class,
             self::SERVER_LOG => ServerlogHandlerConfiguration::class,
             self::SERVICE => ServiceHandlerConfiguration::class,
             self::SLACK => SlackHandlerConfiguration::class,
             self::SLACKBOT => SlackbotHandlerConfiguration::class,
-            self::SLACKWEBHOOK => SlackwebhookHandlerConfiguration::class,
+            self::SLACKWEBHOOK => SlackWebhookHandlerConfiguration::class,
             self::SOCKET => SocketHandlerConfiguration::class,
             self::STREAM => StreamHandlerConfiguration::class,
             self::SWIFT_MAILER => SwiftMailerHandlerConfiguration::class,
             self::SYMFONY_MAILER => SymfonyMailerHandlerConfiguration::class,
             self::SYSLOG => SyslogHandlerConfiguration::class,
-            self::SYSLOGUDP => SyslogudpHandlerConfiguration::class,
-            self::TELEGRAM => TelegramHandlerConfiguration::class,
+            self::SYSLOGUDP => SysLogUdpHandlerConfiguration::class,
+            self::TELEGRAM => TelegramBotHandlerConfiguration::class,
             self::TEST => TestHandlerConfiguration::class,
             self::VERBOSITY_LEVELS => VerbosityLevelHandlerConfiguration::class,
-            self::WHATFAILUREGROUP => WhatfailuregroupHandlerConfiguration::class,
+            self::WHATFAILUREGROUP => WhatFailureGroupHandlerConfiguration::class,
         };
     }
 
