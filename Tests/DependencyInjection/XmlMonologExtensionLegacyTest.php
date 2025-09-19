@@ -9,9 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace DependencyInjection;
+namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection;
 
-use Symfony\Bundle\MonologBundle\Tests\DependencyInjection\FixtureMonologExtensionTestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
