@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace DependencyInjection;
+namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection;
 
 use Monolog\Attribute\AsMonologProcessor;
 use Monolog\Attribute\WithMonologChannel;
@@ -19,7 +19,6 @@ use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
-use Symfony\Bundle\MonologBundle\Tests\DependencyInjection\DependencyInjectionTestCase;
 use Symfony\Bundle\MonologBundle\Tests\DependencyInjection\Fixtures\AsMonologProcessor\FooProcessor;
 use Symfony\Bundle\MonologBundle\Tests\DependencyInjection\Fixtures\AsMonologProcessor\FooProcessorWithPriority;
 use Symfony\Bundle\MonologBundle\Tests\DependencyInjection\Fixtures\AsMonologProcessor\RedeclareMethodProcessor;
