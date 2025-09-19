@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class YamlLegacyMonologExtensionTest extends FixtureMonologExtensionTestCase
+class YamlMonologExtensionLegacyTest extends FixtureMonologExtensionTestCase
 {
     protected function loadFixture(ContainerBuilder $container, $fixture)
     {
